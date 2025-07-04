@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(machi VERSION 1.0.0 LANGUAGES CXX)
+project(machi VERSION 1.0.0 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -21,10 +21,9 @@ find_package(glm REQUIRED)
 set(GLAD_SOURCES
     lib/glad/src/glad.c
 )
-
 # Create GLAD library
-add_library(glad STATIC ${GLAD_SOURCES})
-target_include_directories(glad PUBLIC lib/glad/include)
+add_library(glad ${GLAD_SOURCES})
+set_target_properties(glad PROPERTIES LINKER_LANGUAGE C C_STANDARD 99)
 
 # Collect source files
 file(GLOB_RECURSE SOURCES "src/*.cpp")
