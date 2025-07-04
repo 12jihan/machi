@@ -2,52 +2,44 @@ cmake_minimum_required(VERSION 3.10)
 
 project(machi VERSION 1.0.0 LANGUAGES C CXX)
 
+# Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic")
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O0")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
-
-# Add include directory
-include_directories(include)
-
 # Find required packages
-find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
 find_package(glm REQUIRED)
 
-add_subdirectory(external/glfw)
-add_subdirectory(external/glad)
-# Add GLAD ()
-set(GLAD_SRC
-    lib/glad/src/glad.c
-)
-add_library(glad ${GLAD_SRC})
-set_target_properties(glad PROPERTIES LINKER_LANGUAGE C C_STANDARD 99)
-
-# Collect source files
-file(GLOB_RECURSE SOURCES "src/*.cpp")
-file(GLOB_RECURSE HEADERS "include/*.h" "include/*.hpp")
-
-# Create executable
-add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
-
 # Include directories
-target_include_directories(${PROJECT_NAME} PRIVATE
-    include
-    lib/glad/include
-)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/glad/include)
+
+# Adding Glad src files (assuming they're in lib folder)
+file(GLOB GLAD_SRC "${CMAKE_CURRENT_SOURCE_DIR}/lib/glad/src/*.c")
+
+# Create your executable
+add_executable(${PROJECT_NAME} src/main.cpp ${GLAD_SRC})
 
 # Link libraries
 target_link_libraries(${PROJECT_NAME}
-    OpenGL::GL
     glfw
     glm::glm
-    glad
+    ${CMAKE_DL_LIBS}  # For dynamic loading (needed by GLAD)
 )
 
-# Set output directory
-set_target_properties(${PROJECT_NAME} PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-)
+# Platform-specific setup
+if(WIN32)
+  # Windows: Link with OpenGL32
+  target_link_libraries(${PROJECT_NAME} opengl32)
+
+elseif(APPLE)
+  # macOS: Special handling for OpenGL conflicts
+  target_compile_definitions(${PROJECT_NAME} PRIVATE
+        GL_SILENCE_DEPRECATION    # Silence macOS OpenGL deprecation warnings
+        GLFW_INCLUDE_NONE        # Prevent GLFW from auto-including OpenGL headers
+    )
+  target_link_libraries(${PROJECT_NAME} "-framework OpenGL")
+
+else()
+  # Linux: Link with OpenGL
+  target_link_libraries(${PROJECT_NAME} GL)
+endif()
