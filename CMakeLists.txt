@@ -17,12 +17,13 @@ find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
 find_package(glm REQUIRED)
 
-# Add GLAD (OpenGL loader)
-set(GLAD_SOURCES
+add_subdirectory(external/glfw)
+add_subdirectory(external/glad)
+# Add GLAD ()
+set(GLAD_SRC
     lib/glad/src/glad.c
 )
-# Create GLAD library
-add_library(glad ${GLAD_SOURCES})
+add_library(glad ${GLAD_SRC})
 set_target_properties(glad PROPERTIES LINKER_LANGUAGE C C_STANDARD 99)
 
 # Collect source files
