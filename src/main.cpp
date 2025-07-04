@@ -1,7 +1,11 @@
 #include "../include/WindowManager.hpp"
 
+// clang-format off
+// CRITICAL: GLAD must be included before GLFW - do not reorder!
+#include <glad/glad.h> 
 #include <GLFW/glfw3.h>
-#include <glad/glad.h> // Must be included before GLFW
+// clang-format on
+
 #include <iostream>
 
 const char *vertexShaderSource = R"(
