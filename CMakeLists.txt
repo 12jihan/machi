@@ -6,6 +6,9 @@ project(machi VERSION 1.0.0 LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Generate compile_commands.json for LSP support (LazyVim, clangd, etc.)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # Find required packages
 find_package(glfw3 REQUIRED)
 find_package(glm REQUIRED)
@@ -34,9 +37,9 @@ if(WIN32)
 elseif(APPLE)
   # macOS: Special handling for OpenGL conflicts
   target_compile_definitions(${PROJECT_NAME} PRIVATE
-        GL_SILENCE_DEPRECATION    # Silence macOS OpenGL deprecation warnings
-        GLFW_INCLUDE_NONE        # Prevent GLFW from auto-including OpenGL headers
-    )
+    GL_SILENCE_DEPRECATION    # Silence macOS OpenGL deprecation warnings
+    GLFW_INCLUDE_NONE        # Prevent GLFW from auto-including OpenGL headers
+  )
   target_link_libraries(${PROJECT_NAME} "-framework OpenGL")
 
 else()

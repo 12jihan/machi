@@ -1,0 +1,6 @@
+CompileFlags:
+  Add:
+    - -I./lib/glad/include
+    - -DGL_SILENCE_DEPRECATION
+    - -DGLFW_INCLUDE_NONE
+  CompilationDatabase: ./build
