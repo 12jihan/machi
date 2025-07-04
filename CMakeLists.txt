@@ -19,8 +19,17 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/glad/include)
 # Adding Glad src files (assuming they're in lib folder)
 file(GLOB GLAD_SRC "${CMAKE_CURRENT_SOURCE_DIR}/lib/glad/src/*.c")
 
+# App sources -- explicitly list them out // I'm not for now because i'm lazy
+set(APP_SRC
+  src/main.cpp
+  src/WindowManager.cpp
+)
+
 # Create your executable
-add_executable(${PROJECT_NAME} src/main.cpp ${GLAD_SRC})
+add_executable(${PROJECT_NAME}
+  ${APP_SRC}
+  ${GLAD_SRC}
+)
 
 # Link libraries
 target_link_libraries(${PROJECT_NAME}
