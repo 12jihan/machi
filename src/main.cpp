@@ -25,8 +25,8 @@ void main() {
 )";
 
 int main() {
-  WindowManager test;
-  test.count();
+  WindowManager *test;
+  test->count();
   // Initialize GLFW
   if (!glfwInit()) {
     std::cerr << "Failed to initialize GLFW" << std::endl;
