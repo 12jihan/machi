@@ -1,0 +1,78 @@
+# .clang-format - Configuration to force multi-line function formatting
+BasedOnStyle: Google
+Language: Cpp
+Standard: c++17
+
+# Never allow short functions on a single line
+AllowShortFunctionsOnASingleLine: Empty
+
+# Alternative options for AllowShortFunctionsOnASingleLine:
+# None        - Never allow single line functions
+# InlineOnly  - Only allow inline functions (in class definitions)
+# Empty       - Only allow empty functions: void foo() {}
+# Inline      - Allow inline and empty functions
+# All         - Allow all short functions (default behavior you're seeing)
+
+# Related settings that also help:
+AllowShortBlocksOnASingleLine: Never
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: false
+
+# Brace settings
+BreakBeforeBraces: Attach
+# If you prefer braces on new lines:
+# BreakBeforeBraces: Allman
+
+# Other useful settings
+IndentWidth: 2
+TabWidth: 2
+UseTab: Never
+ColumnLimit: 100
+
+# Spacing
+SpaceAfterCStyleCast: false
+SpaceBeforeParens: ControlStatements
+SpaceInEmptyParentheses: false
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+SpaceBeforeAssignmentOperators: true
+
+# Alignment
+AlignConsecutiveAssignments: None
+AlignConsecutiveDeclarations: None
+AlignOperands: Align
+AlignTrailingComments: true
+
+# Includes
+SortIncludes: Never
+IncludeBlocks: Preserve
+
+# Pointers and references
+PointerAlignment: Left
+ReferenceAlignment: Left
+
+# Comments
+ReflowComments: true
+
+# Namespaces
+NamespaceIndentation: None
+CompactNamespaces: false
+
+# Classes
+AccessModifierOffset: -1
+ConstructorInitializerIndentWidth: 4
+BreakConstructorInitializers: BeforeColon
+
+# Functions
+AllowAllParametersOfDeclarationOnNextLine: true
+BinPackParameters: true
+BinPackArguments: true
+
+# Control flow
+IndentCaseLabels: true
+
+# Misc
+KeepEmptyLinesAtTheStartOfBlocks: false
+MaxEmptyLinesToKeep: 1
+SpaceAfterTemplateKeyword: true

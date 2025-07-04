@@ -1,10 +1,7 @@
-#include "../include/WindowManager.hpp"
+// #include "../include/WindowManager.hpp"
 
-// clang-format off
-// CRITICAL: GLAD must be included before GLFW - do not reorder!
-#include <glad/glad.h> 
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
-// clang-format on
 
 #include <iostream>
 
@@ -25,8 +22,6 @@ void main() {
 )";
 
 int main() {
-  WindowManager test;
-  test.count();
   // Initialize GLFW
   if (!glfwInit()) {
     std::cerr << "Failed to initialize GLFW" << std::endl;
@@ -39,8 +34,7 @@ int main() {
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
   // Create window
-  GLFWwindow *window =
-      glfwCreateWindow(800, 600, "OpenGL With GLAD", nullptr, nullptr);
+  GLFWwindow *window = glfwCreateWindow(800, 600, "OpenGL With GLAD", nullptr, nullptr);
   if (!window) {
     std::cerr << "Failed to create GLFW window" << std::endl;
     glfwTerminate();
