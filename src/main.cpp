@@ -1,3 +1,5 @@
+#include "../include/WindowManager.hpp"
+
 #include <GLFW/glfw3.h>
 #include <glad/glad.h> // Must be included before GLFW
 #include <iostream>
@@ -19,6 +21,8 @@ void main() {
 )";
 
 int main() {
+  WindowManager test;
+  test.count();
   // Initialize GLFW
   if (!glfwInit()) {
     std::cerr << "Failed to initialize GLFW" << std::endl;

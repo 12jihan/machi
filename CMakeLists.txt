@@ -46,3 +46,9 @@ else()
   # Linux: Link with OpenGL
   target_link_libraries(${PROJECT_NAME} GL)
 endif()
+
+# Print some useful information
+message(STATUS "> Project: ${PROJECT_NAME} v${PROJECT_VERSION}")
+message(STATUS "> C++ Standard: ${CMAKE_CXX_STANDARD}")
+message(STATUS "> Build Type: ${CMAKE_BUILD_TYPE}")
+message(STATUS "> Output Directory: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
