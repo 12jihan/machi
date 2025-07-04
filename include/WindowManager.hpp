@@ -4,16 +4,16 @@
 #include <string>
 
 class WindowManager {
-private:
+ private:
   GLFWwindow *window;
   std::string title;
   int width;
   int height;
   void createWindow(std::string title, int width, int height);
-  void makeContextCurrent();
+  void makeContextCur(GLFWwindow *window);
   void windowHints();
 
-public:
+ public:
   void init();
   void configure();
   void pollEvents();

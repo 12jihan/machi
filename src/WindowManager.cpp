@@ -25,7 +25,7 @@ void WindowManager::createWindow(std::string title, int width, int height) {
   throw std::runtime_error("Trouble Creating GLFW window");
 }
 
-void makeCurContext(GLFWwindow *window) {
+void WindowManager::makeContextCur(GLFWwindow *window) {
   glfwMakeContextCurrent(window);
 }
 
