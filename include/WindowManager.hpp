@@ -13,22 +13,23 @@ class WindowManager {
   bool isFullscreen;
   bool isInitialized;
 
+  void windowHints();
   void createWindow();
   void makeContextCur(GLFWwindow *window);
-  void windowHints();
 
  public:
-  WindowManager(std::string &title, int width, int height);
+  WindowManager(const std::string &title, int width, int height);
   ~WindowManager();
 
   // Delete copy constructor and assignment operator
   // WindowManager(const WindowManager &) = delete;
   // WindowManager &operator=(const WindowManager &) = delete;
 
-  void init();
-  void pollEvents();
-  const GLFWwindow *getWindow();
+  // void init();
   std::string getTitle();
+  const GLFWwindow *getWindow();
   std::array<int, 2> getWindowSize();
   bool shouldClose() const;
+  void pollEvents() const;
+  void swapBuffers() const;
 };

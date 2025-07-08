@@ -4,14 +4,14 @@
 
 int main() {
   WindowManager windowManager("MACHI - OPENGL TEST", 800, 600);
-  windowManager.init();
+  // windowManager.init();
 
   // Render loop
-  while (windowManager.shouldClose()) {
+  while (!windowManager.shouldClose()) {
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glfwSwapBuffers();
-    glfwPollEvents();
+    windowManager.swapBuffers();
+    windowManager.pollEvents();
   }
 
   glfwTerminate();

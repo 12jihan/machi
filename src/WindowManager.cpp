@@ -6,21 +6,12 @@
 #include <iostream>
 #include <stdexcept>
 
-WindowManager::WindowManager(std::string& title, int width, int height)
+WindowManager::WindowManager(const std::string& title, int width, int height)
     : window(nullptr),
       title("MACHI - OpenGL Game Engine"),
       width(640),
       height(480),
-      isInitialized(false) {}
-
-WindowManager::~WindowManager() {
-  if (window) {
-    glfwDestroyWindow(window);
-  }
-  glfwTerminate();
-}
-
-void WindowManager::init() {
+      isInitialized(false) {
   if (!glfwInit()) {
     std::cerr << "Failed to initialize GLFW" << std::endl;
     std::exit(EXIT_FAILURE);
@@ -44,6 +35,13 @@ void WindowManager::init() {
   glfwMakeContextCurrent(window);
 }
 
+WindowManager::~WindowManager() {
+  if (window) {
+    glfwDestroyWindow(window);
+  }
+  glfwTerminate();
+}
+
 void WindowManager::windowHints() {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -62,18 +60,20 @@ void WindowManager::makeContextCur(GLFWwindow* window) {
   glfwMakeContextCurrent(window);
 }
 
-void WindowManager::pollEvents() {
+bool WindowManager::shouldClose() const {
+  return window ? glfwWindowShouldClose(window) : true;
+}
+
+void WindowManager::pollEvents() const {
   glfwPollEvents();
 }
 
-std::array<int, 2> getWindowSize() {
+void WindowManager::swapBuffers() const {}
+
+std::array<int, 2> WindowManager::getWindowSize() {
   return {800, 800};
 }
 
 const GLFWwindow* WindowManager::getWindow() {
   return window;
-}
-
-bool shouldClose() const {
-  return window ? glfwWindowShouldClose(window) : true;
 }
