@@ -16,12 +16,17 @@ WindowManager::WindowManager(const std::string& title, int width, int height)
     std::cerr << "Failed to initialize GLFW" << std::endl;
     std::exit(EXIT_FAILURE);
   }
+
   windowHints();
   window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
+
+  // check if window was created
   if (window == nullptr) {
     std::cout << "Trouble Creating GLFW window" << std::endl;
     throw std::runtime_error("Trouble Creating GLFW window");
   }
+
+  // change the window context
   glfwMakeContextCurrent(window);
   // TODO: add this in when you get to user input...
   //  glfwSetFramebufferSizeCallback(window, frameBufferCB);
