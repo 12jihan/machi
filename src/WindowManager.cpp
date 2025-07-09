@@ -28,16 +28,13 @@ WindowManager::WindowManager(const std::string& title, int width, int height)
 
   // change the window context
   glfwMakeContextCurrent(window);
-  // TODO: add this in when you get to user input...
-  //  glfwSetFramebufferSizeCallback(window, frameBufferCB);
+  glfwSetFramebufferSizeCallback(window, frameBufferCB);
 
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
     std::cout << "Failed to initialize GLAD" << std::endl;
     glfwTerminate();
     throw std::runtime_error("Trouble Setting Up Glad");
   }
-
-  glfwMakeContextCurrent(window);
 }
 
 WindowManager::~WindowManager() {
@@ -45,6 +42,11 @@ WindowManager::~WindowManager() {
     glfwDestroyWindow(window);
   }
   glfwTerminate();
+}
+
+void WindowManager::frameBufferCB(GLFWwindow* window, int width, int height) {
+  std::cout << "testing" << std::endl;
+  glViewport(0, 0, width, height);
 }
 
 void WindowManager::windowHints() {
@@ -76,7 +78,7 @@ void WindowManager::pollEvents() const {
 void WindowManager::swapBuffers() const {}
 
 std::array<int, 2> WindowManager::getWindowSize() {
-  return {800, 800};
+  return {width, height};
 }
 
 const GLFWwindow* WindowManager::getWindow() {

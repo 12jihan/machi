@@ -16,6 +16,7 @@ class WindowManager {
   void windowHints();
   void createWindow();
   void makeContextCur(GLFWwindow *window);
+  void frameBufferCB(GLFWwindow *window, int width, int height);
 
  public:
   WindowManager(const std::string &title, int width, int height);
