@@ -3,7 +3,6 @@
 #include <array>
 #include <string>
 
-// TODO: I need to make sure later that some of the memebers here are properly guarderd later
 class WindowManager {
  private:
   GLFWwindow *window;
@@ -16,7 +15,7 @@ class WindowManager {
   void windowHints();
   void createWindow();
   void makeContextCur(GLFWwindow *window);
-  void frameBufferCB(GLFWwindow *window, int width, int height);
+  static void frameBufferCB(GLFWwindow *window, int width, int height);
 
  public:
   WindowManager(const std::string &title, int width, int height);
@@ -28,7 +27,7 @@ class WindowManager {
 
   // void init();
   std::string getTitle();
-  const GLFWwindow *getWindow();
+  const GLFWwindow *getWindow() const;
   std::array<int, 2> getWindowSize();
   bool shouldClose() const;
   void pollEvents() const;

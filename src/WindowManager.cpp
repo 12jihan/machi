@@ -45,8 +45,8 @@ WindowManager::~WindowManager() {
 }
 
 void WindowManager::frameBufferCB(GLFWwindow* window, int width, int height) {
-  std::cout << "testing" << std::endl;
   glViewport(0, 0, width, height);
+  std::cout << "testing" << "w: " << width << "h: " << height << std::endl;
 }
 
 void WindowManager::windowHints() {
@@ -75,12 +75,21 @@ void WindowManager::pollEvents() const {
   glfwPollEvents();
 }
 
-void WindowManager::swapBuffers() const {}
-
-std::array<int, 2> WindowManager::getWindowSize() {
-  return {width, height};
+void WindowManager::swapBuffers() const {
+  if (window) {
+    glfwSwapBuffers(window);
+  }
 }
 
-const GLFWwindow* WindowManager::getWindow() {
+const GLFWwindow* WindowManager::getWindow() const {
   return window;
+}
+
+std::array<int, 2> WindowManager::getWindowSize() {
+  if (window) {
+    int w, h;
+    glfwGetWindowSize(window, &w, &h);
+    return {w, h};  // Fixed: return actual window size
+  }
+  return {0, 0};
 }
