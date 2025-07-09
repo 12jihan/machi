@@ -7,10 +7,8 @@ class WindowManager {
  private:
   GLFWwindow *window;
   std::string title;
-  int width;
-  int height;
-  bool isFullscreen;
-  bool isInitialized;
+  int width, height;
+  bool isFullscreen, isInitialized;
 
   void windowHints();
   void createWindow();
