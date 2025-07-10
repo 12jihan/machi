@@ -3,7 +3,6 @@
 #include <array>
 #include <string>
 
-// TODO: I need to make sure later that some of the memebers here are properly guarderd later
 class WindowManager {
  private:
   GLFWwindow *window;
