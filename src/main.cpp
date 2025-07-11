@@ -1,19 +1,28 @@
-#include "../include/WindowManager.hpp"
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include "../include/Engine.hpp"
+#include <exception>
+#include <iostream>
 
 int main() {
-  WindowManager windowManager("MACHI - OPENGL TEST", 800, 600);
-  // windowManager.init();
+  try {
+    Engine engine("MACHI - OPENGL TEST", 1024, 768);
 
-  // Render loop
-  while (!windowManager.shouldClose()) {
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    windowManager.swapBuffers();
-    windowManager.pollEvents();
+    if (!engine.init()) {
+      return -1;
+    }
+  } catch (std::exception& e) {
+    std::cerr << "Engine error: " << e.what() << std::endl;
   }
-
-  glfwTerminate();
-  return 0;
+  // WindowManager windowManager("MACHI - OPENGL TEST", 800, 600);
+  // // windowManager.init();
+  //
+  // // Render loop
+  // while (!windowManager.shouldClose()) {
+  //   glClear(GL_COLOR_BUFFER_BIT);
+  //
+  //   windowManager.swapBuffers();
+  //   windowManager.pollEvents();
+  // }
+  //
+  // glfwTerminate();
+  // return 0;
 }
