@@ -1,10 +1,8 @@
+#include "../include/WindowManager.hpp"
 #include <array>
 #include <cstdlib>
 #include <iostream>
 #include <stdexcept>
-#include <glad/glad.h>
-
-#include "../include/WindowManager.hpp"
 
 WindowManager::WindowManager(const std::string& title, int width, int height)
     : window(nullptr),

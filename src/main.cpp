@@ -7,8 +7,10 @@ int main() {
     Engine engine("MACHI - OPENGL TEST", 1024, 768);
 
     if (!engine.init()) {
+      std::cerr << "Failed to initialize engine!" << std::endl;
       return -1;
     }
+
   } catch (std::exception& e) {
     std::cerr << "Engine error: " << e.what() << std::endl;
   }
