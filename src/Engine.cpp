@@ -1,11 +1,11 @@
 #include "../include/Engine.hpp"
 #include "../include/Logger.hpp"
 #include <string>
-#include <iostream>
+// #include <iostream>
 
 Engine::Engine(const std::string &title, int width, int height)
     : title("MACHI - OPENGL TEST"), width(1024), height(768) {
-  Logger::getInstance()->enableFileOutput(true);
+  Logger::getInstance().enableFileOutput(true);
   LOG_INFO("Engine created successfully");
 };
 
