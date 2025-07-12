@@ -4,14 +4,17 @@
 
 class Engine {
  private:
+  WindowManager windowManager;
+
   std::string title;
   int width;
   int height;
   bool isInitialized;
   bool isRunning;
 
-  WindowManager windowManager();
   bool initSubsystems();
+  void update(float deltaTime);
+  void render();
   void clean();
 
  public:
@@ -21,7 +24,5 @@ class Engine {
   // Main engine lifecycle methods
   bool init();
   void run();
-  void render();
-  void update(float deltaTime);
   void shutdown();
 };

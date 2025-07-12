@@ -61,8 +61,8 @@ CompactNamespaces: false
 
 # Classes
 AccessModifierOffset: -1
-ConstructorInitializerIndentWidth: 4
-BreakConstructorInitializers: BeforeColon
+ConstructorInitializerIndentWidth: 2
+BreakConstructorInitializers: AfterColon
 
 # Functions
 AllowAllParametersOfDeclarationOnNextLine: true

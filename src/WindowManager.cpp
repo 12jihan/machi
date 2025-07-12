@@ -4,12 +4,38 @@
 #include <iostream>
 #include <stdexcept>
 
-WindowManager::WindowManager(const std::string& title, int width, int height)
-    : window(nullptr),
-      title("MACHI - OpenGL Game Engine"),
-      width(640),
-      height(480),
-      isInitialized(false) {
+WindowManager::WindowManager(const std::string& title, int width, int height) :
+  window(nullptr),
+  title("MACHI - OpenGL Game Engine"),
+  width(640),
+  height(480) {}  // isInitialized(false)
+
+WindowManager::~WindowManager() {
+  if (window) {
+    glfwDestroyWindow(window);
+  }
+  glfwTerminate();
+}
+
+// void WindowManager::windowHints() {
+//   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+//   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+//   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+//   std::cout << "Window Hints Setup Complete" << std::endl;
+//   // For macOS compatibility
+// #ifdef __APPLE__
+//   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
+// #endif
+//
+//   // Optional: Make window resizable
+//   glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+// }
+//
+// void WindowManager::makeContextCur(GLFWwindow* window) {
+//   glfwMakeContextCurrent(window);
+// }
+
+void WindowManager::init() {
   if (!glfwInit()) {
     std::cerr << "Failed to initialize GLFW" << std::endl;
     std::exit(EXIT_FAILURE);
@@ -38,30 +64,7 @@ WindowManager::WindowManager(const std::string& title, int width, int height)
   glfwMakeContextCurrent(window);
 }
 
-WindowManager::~WindowManager() {
-  if (window) {
-    glfwDestroyWindow(window);
-  }
-  glfwTerminate();
-}
-
-void WindowManager::windowHints() {
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-  std::cout << "Window Hints Setup Complete" << std::endl;
-  // For macOS compatibility
-#ifdef __APPLE__
-  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
-#endif
-
-  // Optional: Make window resizable
-  glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-}
-
-void WindowManager::makeContextCur(GLFWwindow* window) {
-  glfwMakeContextCurrent(window);
-}
+void WindowManager::clean() {}
 
 bool WindowManager::shouldClose() const {
   return window ? glfwWindowShouldClose(window) : true;

@@ -10,7 +10,7 @@ int main() {
       std::cerr << "Failed to initialize engine!" << std::endl;
       return -1;
     }
-
+    engine.run();
   } catch (std::exception& e) {
     std::cerr << "Engine error: " << e.what() << std::endl;
   }
