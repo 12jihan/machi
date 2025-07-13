@@ -28,7 +28,7 @@ BreakBeforeBraces: Attach
 IndentWidth: 2
 TabWidth: 2
 UseTab: Never
-ColumnLimit: 100
+ColumnLimit: 400
 
 # Spacing
 SpaceAfterCStyleCast: false
@@ -60,14 +60,14 @@ NamespaceIndentation: None
 CompactNamespaces: false
 
 # Classes
-AccessModifierOffset: -1
-ConstructorInitializerIndentWidth: 2
+AccessModifierOffset: -2
+ConstructorInitializerIndentWidth: 1
 BreakConstructorInitializers: AfterColon
 
 # Functions
-AllowAllParametersOfDeclarationOnNextLine: true
-BinPackParameters: true
-BinPackArguments: true
+AllowAllParametersOfDeclarationOnNextLine: false
+BinPackParameters: false
+BinPackArguments: false
 
 # Control flow
 IndentCaseLabels: true

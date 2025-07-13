@@ -16,10 +16,11 @@ struct WindowConfig {
   std::string title = "Game Window";
   int width = 1024;
   int height = 768;
+  bool fullscreen = false;
   bool resizable = true;
   bool vsync = true;
-  bool fullscreen = false;
-  int samples = 4;  // MSAA samples
+  bool decorated = true;  // Window border/title bar
+  int samples = 4;        // MSAA samples (0 = disabled)
 
   // OpenGL version
   int glMajorVersion = 3;
@@ -28,59 +29,143 @@ struct WindowConfig {
 };
 
 class WindowManager {
- private:
-  GLFWwindow* window;
-  WindowConfig configh;
-  bool isInitialized;
+private:
+  // Core window data
+  GLFWwindow* m_window;
+  WindowConfig m_config;
+  bool m_isInitialized;
 
-  // Current window state
-  int currentWidth;
-  int currentHeight;
-  double lastFrameTime;
-  double deltaTime;
+  // Window state
+  int m_isFullscreen;
+  std::array<int, 2> m_windowedSize;  // Store windowed size when going fullscreen
+  std::array<int, 2> m_windowedPos;   // Store windowed position
 
-  // Event callbacks
-  ResizeCallback resizeCallback;
-  KeyCallback keyCallback;
-  MouseButtonCallback mouseButtonCallback;
-  MouseMoveCallback mouseMoveCallback;
-  ScrollCallback scrollCallback;
+  // Callbacks
+  ResizeCallback m_resizeCallback;
+  KeyCallback m_keyCallback;
+  MouseButtonCallback m_mouseButtonCallback;
+  MouseMoveCallback m_mouseMoveCallback;
+  ScrollCallback m_scrollCallback;
 
   // Static GLFW callbacks (these call our member functions)
-  static void glfwFramebufferSizeCallback(GLFWwindow* window, int width, int height);
+  static void glfwErrorCallback(int error, const char* description);
+  static void glfwResizeCallback(GLFWwindow* window, int width, int height);
   static void glfwKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
   static void glfwMouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
-  static void glfwCursorPosCallback(GLFWwindow* window, double xpos, double ypos);
+  static void glfwMouseMoveCallback(GLFWwindow* window, double xpos, double ypos);
   static void glfwScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
-  static void glfwErrorCallback(int error, const char* description);
 
   // Helper methods
+  void setupWindowHints();
   void setupCallbacks();
-  void setupOpenGLSettings();
-  bool initializeGLFW();
-  bool createWindow();
-  bool initializeOpenGL();
+  bool initializeGLAD();
+  void centerWindow();
 
-  // void windowHints();
-  // void createWindow();
-  // void makeContextCur(GLFWwindow* window);
-
- public:
-  WindowManager(const std::string& title = "Machi - Game Engine Default Title", int width = 1024,
-                int height = 768);
+public:
+  // Constructor/Destructor
+  explicit WindowManager(const WindowConfig& config = {});
+  WindowManager(const std::string& title, int width, int height);
   ~WindowManager();
 
   // Delete copy constructor and assignment operator
-  // WindowManager(const WindowManager &) = delete;
-  // WindowManager &operator=(const WindowManager &) = delete;
+  WindowManager(const WindowManager&) = delete;
+  WindowManager& operator=(const WindowManager&) = delete;
 
-  void init();
-  void clean();
-
+  // Core window operations
+  bool initialize();
+  void shutdown();
   bool shouldClose() const;
-  void pollEvents() const;
   void swapBuffers() const;
-  std::string getTitle();
-  const GLFWwindow* getWindow();
-  std::array<int, 2> getWindowSize();
+  void pollEvents() const;
+  void close();
+
+  // Window properties
+  std::string getTitle() const;
+  void setTitle(const std::string& title);
+
+  std::array<int, 2> getSize() const;
+  void setSize(int width, int height);
+
+  std::array<int, 2> getPosition() const;
+  void setPosition();
+
+  std::array<int, 2> getFramebufferSize() const;
+
+  // Fullscreen management
+  bool isFullscreen() const {
+    return m_isFullscreen;
+  };
+
+  void setFullscreen(bool fullscreen);
+  void toggleFullscreen();
+
+  // VSync
+  bool getVSync() const;
+  void setVSync(bool enabled);
+
+  // Visibility
+  void show();
+  void hide();
+  void minimize();
+  void maximize();
+  void restore();
+
+  // Input state queries (for polling)
+  bool isKeyPressed(int key) const;
+  bool isMouseButtonPressed(int button) const;
+  std::array<double, 2> getMousePosition() const;
+
+  // Callback setters
+  void setResizeCallback(const ResizeCallback& callback) {
+    m_resizeCallback = callback;
+  };
+  void setKeyCallback(const KeyCallback& callback) {
+    m_keyCallback = callback;
+  };
+  void setMouseButtonCallback(const MouseButtonCallback& callback) {
+    m_mouseButtonCallback = callback;
+  };
+  void setMouseMoveback(const MouseMoveCallback& callback) {
+    m_mouseMoveCallback = callback;
+  };
+  void setScrollCallback(const ScrollCallback& callback) {
+    m_scrollCallback = callback;
+  };
+
+  // Clear callbacks
+  void clearResizeCallback(const ResizeCallback& callback) {
+    m_resizeCallback = nullptr;
+  };
+  void clearKeyCallback(const KeyCallback& callback) {
+    m_keyCallback = nullptr;
+  };
+  void clearMouseButtonCallback(const MouseButtonCallback& callback) {
+    m_mouseButtonCallback = nullptr;
+  };
+  void clearMouseMoveback(const MouseMoveCallback& callback) {
+    m_mouseMoveCallback = nullptr;
+  };
+  void clearScrollCallback(const ScrollCallback& callback) {
+    m_scrollCallback = nullptr;
+  };
+
+  // Getters
+  GLFWwindow* getWindow() const {
+    return m_window;
+  };
+  const WindowConfig& getConfig() const {
+    return m_config;
+  };
+  bool isInitialized() const {
+    return m_isInitialized;
+  }
+
+  // Utility
+  void makeContextCurrent();
+  void setClipboardString(const std::string& text);
+  std::string getClipboardString() const;
+
+  // Monitor/Display info
+  std::array<int, 2> getPrimaryMonitorSize() const;
+  std::array<int, 2> getPrimaryMonitorWorkArea() const;
 };
