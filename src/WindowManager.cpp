@@ -113,7 +113,7 @@ bool WindowManager::initialize() {
 void WindowManager::setupWindowHints() {
   // OpenGL version and profile
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, m_config.glMajorVersion);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, m_config.glMinorVersion);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, m_config.glMinorVersion);
 
   if (m_config.glCoreProfile) {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
