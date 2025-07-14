@@ -395,12 +395,12 @@ void Engine::setWindowTitle(const std::string& title) {
 }
 
 // @TODO: Fix fullscreen
-// void Engine::toggleFullscreen() {
-//   if (m_windowManager) {
-//     m_windowManager->toggleFullscreen();
-//     m_config.fullscreen = m_windowManager->isFullscreen();
-//   }
-// }
+void Engine::toggleFullscreen() {
+  if (m_windowManager) {
+    m_windowManager->toggleFullscreen();
+    m_config.fullscreen = m_windowManager->isFullscreen();
+  }
+}
 
 bool Engine::isFullscreen() const {
   return m_windowManager ? m_windowManager->isFullscreen() : false;

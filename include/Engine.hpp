@@ -91,6 +91,7 @@ private:
   std::vector<EventHandler> m_eventHandlers;
   std::vector<EngineEvent> m_eventQueue;
 
+  // TODO: Create SceneManager
   // Scene management - this will hold your game's current state
   // std::unique_ptr<Scene> m_currentScene;
   // std::unique_ptr<Scene> m_nextScene;  // For scene transitions
@@ -184,6 +185,7 @@ public:
   void toggleFullscreen();
   bool isFullscreen() const;
 
+  // TODO: Create SceneManager
   // Scene management - this is how you'll organize your game content
   // void setScene(std::unique_ptr<Scene> scene);
   // void transition(std::unique_ptr<Scene> scene);
