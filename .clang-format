@@ -28,7 +28,9 @@ BreakBeforeBraces: Attach
 IndentWidth: 2
 TabWidth: 2
 UseTab: Never
-ColumnLimit: 400
+ColumnLimit: 120
+BreakBeforeTernaryOperators: true
+ContinuationIndentWidth: 2
 
 # Spacing
 SpaceAfterCStyleCast: false

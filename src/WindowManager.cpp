@@ -1,16 +1,21 @@
 #include "../include/WindowManager.hpp"
 #include <GLFW/glfw3.h>
 #include "../include/Logger.hpp"
-#include <iostream>
 #include <stdexcept>
-#include <cstring>
 
 static bool s_glfwInitialized = false;
 static int s_windowCount = 0;
 
-WindowManager::WindowManager(const WindowConfig& config) : m_window(nullptr), m_config(config), m_isInitialized(false), m_isFullscreen(false), m_windowedSize{config.width, config.height}, m_windowedPos{100, 100} {}
+WindowManager::WindowManager(const WindowConfig& config) :
+ m_window(nullptr),
+ m_config(config),
+ m_isInitialized(false),
+ m_isFullscreen(false),
+ m_windowedSize{config.width, config.height},
+ m_windowedPos{100, 100} {}
 
-WindowManager::WindowManager(const std::string& title, int width, int height) : WindowManager(WindowConfig{title, width, height}) {}
+WindowManager::WindowManager(const std::string& title, int width, int height) :
+ WindowManager(WindowConfig{title, width, height}) {}
 
 WindowManager::~WindowManager() {
   shutdown();
@@ -39,7 +44,8 @@ bool WindowManager::initialize() {
 
     // Create window
     GLFWmonitor* monitor = m_config.fullscreen ? glfwGetPrimaryMonitor() : nullptr;
-    m_window = glfwCreateWindow(m_config.width, m_config.height, m_config.title.c_str(), monitor, nullptr);
+    m_window =
+        glfwCreateWindow(m_config.width, m_config.height, m_config.title.c_str(), monitor, nullptr);
 
     if (!m_window) {
       throw std::runtime_error("Failed to create GLFW window");
@@ -183,7 +189,11 @@ void WindowManager::glfwResizeCallback(GLFWwindow* window, int width, int height
   }
 }
 
-void WindowManager::glfwKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+void WindowManager::glfwKeyCallback(GLFWwindow* window,
+                                    int key,
+                                    int scancode,
+                                    int action,
+                                    int mods) {
   auto* windowManager = static_cast<WindowManager*>(glfwGetWindowUserPointer(window));
   if (windowManager && windowManager->m_keyCallback) {
     windowManager->m_keyCallback(key, scancode, action, mods);
@@ -307,7 +317,13 @@ void WindowManager::setFullscreen(bool fullscreen) {
     glfwSetWindowMonitor(m_window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
   } else {
     // Restore windowed mode
-    glfwSetWindowMonitor(m_window, nullptr, m_windowedPos[0], m_windowedPos[1], m_windowedSize[0], m_windowedSize[1], 0);
+    glfwSetWindowMonitor(m_window,
+                         nullptr,
+                         m_windowedPos[0],
+                         m_windowedPos[1],
+                         m_windowedSize[0],
+                         m_windowedSize[1],
+                         0);
   }
 
   m_isFullscreen = fullscreen;

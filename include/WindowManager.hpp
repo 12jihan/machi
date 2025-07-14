@@ -3,7 +3,6 @@
 #include <GLFW/glfw3.h>
 #include <functional>
 #include <string>
-#include <memory>
 
 // Event callback types
 using ResizeCallback = std::function<void(int width, int height)>;
@@ -125,7 +124,7 @@ public:
   void setMouseButtonCallback(const MouseButtonCallback& callback) {
     m_mouseButtonCallback = callback;
   };
-  void setMouseMoveback(const MouseMoveCallback& callback) {
+  void setMouseMoveCallback(const MouseMoveCallback& callback) {
     m_mouseMoveCallback = callback;
   };
   void setScrollCallback(const ScrollCallback& callback) {
@@ -142,7 +141,7 @@ public:
   void clearMouseButtonCallback(const MouseButtonCallback& callback) {
     m_mouseButtonCallback = nullptr;
   };
-  void clearMouseMoveback(const MouseMoveCallback& callback) {
+  void clearMouseMoveCallback(const MouseMoveCallback& callback) {
     m_mouseMoveCallback = nullptr;
   };
   void clearScrollCallback(const ScrollCallback& callback) {
