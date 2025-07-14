@@ -44,8 +44,7 @@ bool WindowManager::initialize() {
 
     // Create window
     GLFWmonitor* monitor = m_config.fullscreen ? glfwGetPrimaryMonitor() : nullptr;
-    m_window =
-        glfwCreateWindow(m_config.width, m_config.height, m_config.title.c_str(), monitor, nullptr);
+    m_window = glfwCreateWindow(m_config.width, m_config.height, m_config.title.c_str(), monitor, nullptr);
 
     if (!m_window) {
       throw std::runtime_error("Failed to create GLFW window");
@@ -76,12 +75,12 @@ bool WindowManager::initialize() {
     m_isInitialized = true;
 
     LOG_INFO_F(
-        "[WindowManager] Window created successfully: \n\t+ Title: {} \n\t+(width: {}, "
-        "height: "
-        "{})",
-        m_config.title,
-        m_config.width,
-        m_config.height);
+      "[WindowManager] Window created successfully: \n\t+ Title: {} \n\t+(width: {}, "
+      "height: "
+      "{})",
+      m_config.title,
+      m_config.width,
+      m_config.height);
     return true;
   } catch (const std::exception& e) {
     LOG_INFO_F("[WindowManager] Initialization failed: {}", e.what());
@@ -157,6 +156,7 @@ bool WindowManager::initializeGLAD() {
   return true;
 }
 
+// BUG: Some how this doesn't work
 void WindowManager::centerWindow() {
   if (!m_window)
     return;
@@ -189,11 +189,7 @@ void WindowManager::glfwResizeCallback(GLFWwindow* window, int width, int height
   }
 }
 
-void WindowManager::glfwKeyCallback(GLFWwindow* window,
-                                    int key,
-                                    int scancode,
-                                    int action,
-                                    int mods) {
+void WindowManager::glfwKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
   auto* windowManager = static_cast<WindowManager*>(glfwGetWindowUserPointer(window));
   if (windowManager && windowManager->m_keyCallback) {
     windowManager->m_keyCallback(key, scancode, action, mods);
@@ -297,6 +293,7 @@ std::array<int, 2> WindowManager::getFramebufferSize() const {
   return getSize();
 }
 
+// @TODO: Fix fullscreen
 void WindowManager::setFullscreen(bool fullscreen) {
   if (!m_window || m_isFullscreen == fullscreen) {
     return;
@@ -317,18 +314,14 @@ void WindowManager::setFullscreen(bool fullscreen) {
     glfwSetWindowMonitor(m_window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
   } else {
     // Restore windowed mode
-    glfwSetWindowMonitor(m_window,
-                         nullptr,
-                         m_windowedPos[0],
-                         m_windowedPos[1],
-                         m_windowedSize[0],
-                         m_windowedSize[1],
-                         0);
+    glfwSetWindowMonitor(
+      m_window, nullptr, m_windowedPos[0], m_windowedPos[1], m_windowedSize[0], m_windowedSize[1], 0);
   }
 
   m_isFullscreen = fullscreen;
 }
 
+// @TODO: Fix fullscreen
 void WindowManager::toggleFullscreen() {
   setFullscreen(!m_isFullscreen);
 }
@@ -370,4 +363,27 @@ std::array<int, 2> WindowManager::getPrimaryMonitorSize() const {
   GLFWmonitor* monitor = glfwGetPrimaryMonitor();
   const GLFWvidmode* mode = glfwGetVideoMode(monitor);
   return {mode->width, mode->height};
+}
+
+std::array<int, 2> WindowManager::getPrimaryMonitorWorkArea() const {
+  GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+  if (!monitor) {
+    return {0, 0};
+  }
+
+  // Get the work area (desktop area minus taskbars, docks, etc.)
+  int x, y, width, height;
+  glfwGetMonitorWorkarea(monitor, &x, &y, &width, &height);
+  return {width, height};
+}
+
+std::array<int, 2> WindowManager::getPosition() const {
+  if (!m_window) {
+    // Return default position if window doesn't exist
+    return {0, 0};
+  }
+
+  int x, y;
+  glfwGetWindowPos(m_window, &x, &y);
+  return {x, y};
 }

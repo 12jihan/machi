@@ -1,6 +1,6 @@
 #include "../include/Engine.hpp"
-#include <GLFW/glfw3.h>
 #include "../include/Logger.hpp"
+#include <GLFW/glfw3.h>
 #include <chrono>
 #include <iomanip>
 #include <memory>
@@ -61,10 +61,11 @@ bool Engine::initialize() {
       LOG_ERROR("[Engine] Failed to initialize window system!");
       return false;
     }
-    if (!initializeRenderingSystem()) {
-      LOG_ERROR("[Engine] Failed to initialize rendering system!");
-      return false;
-    }
+    // @TODO: Create Render class
+    // if (!initializeRenderingSystem()) {
+    //   LOG_ERROR("[Engine] Failed to initialize rendering system!");
+    //   return false;
+    // }
     if (!initializeInputSystem()) {
       LOG_ERROR("[Engine] Failed to initialize input system!");
       return false;
@@ -113,8 +114,8 @@ bool Engine::initializeWindowSystem() {
   m_windowManager->setKeyCallback(
     [this](int key, int scancode, int actions, int mods) -> void { onKeyEvent(key, scancode, actions, mods); });
 
-  m_windowManager->setMouseButtonCallback(
-    [this](int button, int action, int mods) -> void { onMouseButton(button, action, mods); });
+  // m_windowManager->setMouseButtonCallback(
+  // [this](int button, int action, int mods) -> void { onMouseButton(button, action, mods); });
 
   m_windowManager->setMouseMoveCallback([this](double x, double y) -> void { onMouseMove(x, y); });
 
@@ -207,8 +208,9 @@ void Engine::run() {
       // Update frame statistics for performance monitoring
       calculateFrameStats();
     }
+    // @TODO: Create Scene class
     // Handle scene transitions if needed
-    performSceneTransition();
+    // performSceneTransition();
   }
 
   LOG_INFO("[Engine] Main engine loop ended");
@@ -392,12 +394,13 @@ void Engine::setWindowTitle(const std::string& title) {
   }
 }
 
-void Engine::toggleFullscreen() {
-  if (m_windowManager) {
-    m_windowManager->toggleFullscreen();
-    m_config.fullscreen = m_windowManager->isFullscreen();
-  }
-}
+// @TODO: Fix fullscreen
+// void Engine::toggleFullscreen() {
+//   if (m_windowManager) {
+//     m_windowManager->toggleFullscreen();
+//     m_config.fullscreen = m_windowManager->isFullscreen();
+//   }
+// }
 
 bool Engine::isFullscreen() const {
   return m_windowManager ? m_windowManager->isFullscreen() : false;
