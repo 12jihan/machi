@@ -290,8 +290,8 @@ void Engine::run() {
       glClearColor(0.3f, 0.1f, 0.8f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       // renderFrame();
-      glUseProgram(shaderProgram);
       glBindVertexArray(vao);
+      glUseProgram(shaderProgram);
       glDrawArrays(GL_TRIANGLES, 0, 3);
 
       // Update frame statistics for performance monitoring
