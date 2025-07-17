@@ -220,7 +220,7 @@ void Engine::run() {
 
   // fshader
   unsigned fShader;
-  fShader = glCreateShader(GL_VERTEX_SHADER);
+  fShader = glCreateShader(GL_FRAGMENT_SHADER);
   glShaderSource(fShader, 1, &fShaderSrc, nullptr);
   glCompileShader(fShader);
 
@@ -284,18 +284,18 @@ void Engine::run() {
 
     // Only update and render if we're not paused
     if (!m_isPaused) {
-      glClearColor(0.3f, 0.1f, 0.8f, 1.0f);
-      glClear(GL_COLOR_BUFFER_BIT);
       // Update all game systems with the calculated delta time
-      updateSystems(m_deltaTime);
+      // updateSystems(m_deltaTime);
       // Render the current frame
-      glBindVertexArray(vao);
+      glClearColor(0.3f, 0.1f, 0.8f, 1.0f);
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+      // renderFrame();
       glUseProgram(shaderProgram);
+      glBindVertexArray(vao);
       glDrawArrays(GL_TRIANGLES, 0, 3);
-      renderFrame();
 
       // Update frame statistics for performance monitoring
-      calculateFrameStats();
+      // calculateFrameStats();
     }
     // TODO: Create Scene class
     // Handle scene transitions if needed
@@ -332,7 +332,7 @@ void Engine::renderFrame() {
   // Clear the screen with our configured background color
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  // @TODO: Implement Scene class
+  // TODO: Implement Scene class
   // Render the current scene if we have one
   // if (m_currentScene) {
   //   m_currentScene->render();
