@@ -293,7 +293,7 @@ std::array<int, 2> WindowManager::getFramebufferSize() const {
   return getSize();
 }
 
-// @TODO: Fix fullscreen
+// TODO: Fix fullscreen
 void WindowManager::setFullscreen(bool fullscreen) {
   if (!m_window || m_isFullscreen == fullscreen) {
     return;
@@ -321,7 +321,7 @@ void WindowManager::setFullscreen(bool fullscreen) {
   m_isFullscreen = fullscreen;
 }
 
-// @TODO: Fix fullscreen
+// TODO: Fix fullscreen
 void WindowManager::toggleFullscreen() {
   setFullscreen(!m_isFullscreen);
 }

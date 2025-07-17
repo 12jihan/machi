@@ -148,9 +148,11 @@ bool Engine::initializeInputSystem() {
       switch (event.data.keyboard.key) {
         case GLFW_KEY_ESCAPE:
           LOG_INFO("[Engine] Escape pressed - requesting shutdown");
+          shutdown();
           break;
-        case GLFW_KEY_F11:
-          LOG_INFO("[Engine] F11 pressed - toggling fullscreen");
+        case GLFW_KEY_F2:
+          LOG_INFO("[Engine] F2 pressed - toggling fullscreen");
+          m_windowManager->toggleFullscreen();
           break;
         case GLFW_KEY_F1:
           // F1 for debug info
@@ -180,6 +182,89 @@ void Engine::run() {
     return;
   }
 
+  // INFO: --> Shader test starts here
+  const char* vShaderSrc = R"(
+    #version 330 core
+    layout (location = 0) in vec3 aPos;
+    void main()
+    {
+      gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
+    }
+  )";
+
+  const char* fShaderSrc = R"(
+    #version 330 core
+    out vec4 FragColor;
+
+    void main()
+    {
+      FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
+    }
+  )";
+
+  int success;
+  char infoLog[512];
+
+  // vshader
+  unsigned vShader;
+  vShader = glCreateShader(GL_VERTEX_SHADER);
+  glShaderSource(vShader, 1, &vShaderSrc, nullptr);
+  glCompileShader(vShader);
+
+  // Check error for vshader
+  glGetShaderiv(vShader, GL_COMPILE_STATUS, &success);
+  if (!success) {
+    glGetShaderInfoLog(vShader, 512, nullptr, infoLog);
+    LOG_ERROR_F("[Engine] there was an error with the vShader: {}", infoLog);
+  };
+
+  // fshader
+  unsigned fShader;
+  fShader = glCreateShader(GL_VERTEX_SHADER);
+  glShaderSource(fShader, 1, &fShaderSrc, nullptr);
+  glCompileShader(fShader);
+
+  // Check error for fshader
+  glGetShaderiv(fShader, GL_COMPILE_STATUS, &success);
+  if (!success) {
+    glGetShaderInfoLog(fShader, 512, nullptr, infoLog);
+    LOG_ERROR_F("[Engine] there was an error with the fShader: {}", infoLog);
+  };
+
+  // Shader program
+  unsigned int shaderProgram;
+  shaderProgram = glCreateProgram();
+  glAttachShader(shaderProgram, vShader);
+  glAttachShader(shaderProgram, fShader);
+  glLinkProgram(shaderProgram);
+
+  // Check error for shader program
+  glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+  if (!success) {
+    glGetProgramInfoLog(shaderProgram, 512, nullptr, infoLog);
+    LOG_ERROR_F("[Engine] there was an error with the shader program: {}", infoLog);
+  }
+
+  // Delete the shaders when don't using program?
+  glDeleteShader(vShader);
+  glDeleteShader(fShader);
+
+  // VAOs, VBOs, EBOs
+  float vertices[] = {-0.5f, -0.5f, 0.0f, 0.5f, -0.5f, 0.0f, 0.0f, 0.5f, 0.0f};
+  unsigned int vao, vbo;
+  glGenVertexArrays(1, &vao);
+  glGenBuffers(1, &vbo);
+
+  glBindVertexArray(vao);
+
+  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+  glEnableVertexAttribArray(0);
+
+  // INFO: --> Shader test ends here
+
   LOG_INFO("[Engine] startiing main engine loop...");
   m_isRunning = true;
   m_lastFrameTime = std::chrono::high_resolution_clock::now();
@@ -199,16 +284,20 @@ void Engine::run() {
 
     // Only update and render if we're not paused
     if (!m_isPaused) {
+      glClearColor(0.3f, 0.1f, 0.8f, 1.0f);
+      glClear(GL_COLOR_BUFFER_BIT);
       // Update all game systems with the calculated delta time
       updateSystems(m_deltaTime);
-
       // Render the current frame
+      glBindVertexArray(vao);
+      glUseProgram(shaderProgram);
+      glDrawArrays(GL_TRIANGLES, 0, 3);
       renderFrame();
 
       // Update frame statistics for performance monitoring
       calculateFrameStats();
     }
-    // @TODO: Create Scene class
+    // TODO: Create Scene class
     // Handle scene transitions if needed
     // performSceneTransition();
   }
@@ -342,7 +431,7 @@ void Engine::processEventQueue() {
   }
 }
 
-// @TODO: Implement Scene class
+// TODO: Implement Scene class
 // void Engine::performSceneTransition() {
 //   if (m_nextScene) {
 //     // Clean up currentScene
@@ -358,14 +447,14 @@ void Engine::processEventQueue() {
 //   }
 // }
 
-// @TODO: Implement Scene class
+// TODO: Implement Scene class
 // Public interface methods
 // Engine::setScene(std::unique_ptr<Scene> scene) {
 //   m_currentScene = std::move(scene);
 //   Log_INFO("[Engine] Scene set directly");
 // }
 
-// @TODO: Implement Scene class
+// TODO: Implement Scene class
 // void Engine::transitionToScene(std::unique_ptr<Scene> scene) {
 //   m_nextScene = std::move(scene);
 //   LOG_INFO("[Engine] Scene transition queue");
@@ -394,7 +483,7 @@ void Engine::setWindowTitle(const std::string& title) {
   }
 }
 
-// @TODO: Fix fullscreen
+// TODO: Fix fullscreen
 void Engine::toggleFullscreen() {
   if (m_windowManager) {
     m_windowManager->toggleFullscreen();
