@@ -257,11 +257,14 @@ void Engine::run() {
      0.5f,  0.5f,  0.0f,  // top right
      0.5f, -0.5f,  0.0f,  // bottom right
     -0.5f, -0.5f,  0.0f,  // bottom left
-    -0.5f, 0.5f, 0.0f   // top left
+    -0.5f, 0.5f, 0.0f,  // top left
+    0.0f, 0.0f, 0.0f   // center point 
   };
   unsigned int indices[] = {  // note that we start from 0!
-    0, 1, 3,   // first triangle
-    1, 2, 3    // second triangle
+    0, 1,   4,   // first triangle 
+    1, 2,   4,   // second triangle
+    2, 3,   4,   // third triangle
+    3,0,  4,    // fourth triangle
   };
   // clang-format on
   unsigned int vao, vbo, ebo;
@@ -286,7 +289,9 @@ void Engine::run() {
   m_isRunning = true;
   m_lastFrameTime = std::chrono::high_resolution_clock::now();
 
-  // Main engine loop - this is the heart of your game engine
+  // Make outlined
+  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  // Main engine, loop - this is the heart of your game engine
   while (m_isRunning && !m_windowManager->shouldClose()) {
     // Caculate time since last frame for smooth, frame-rate independent updates
     auto currentTime = std::chrono::high_resolution_clock::now();
@@ -310,7 +315,7 @@ void Engine::run() {
 
       glUseProgram(shaderProgram);
       glBindVertexArray(vao);
-      glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+      glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
       glBindVertexArray(0);
 
       // Would normally be in renderFrame() but gonna be here for testing
