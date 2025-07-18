@@ -186,9 +186,10 @@ void Engine::run() {
   const char* vShaderSrc = R"(
     #version 330 core
     layout (location = 0) in vec3 aPos;
+
     void main()
     {
-      gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
+      gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0f);
     }
   )";
 
@@ -269,40 +270,105 @@ void Engine::run() {
   m_isRunning = true;
   m_lastFrameTime = std::chrono::high_resolution_clock::now();
 
-  // Main engine loop - this is the heart of your game engine
-  while (m_isRunning && !m_windowManager->shouldClose()) {
-    // Caculate time since last frame for smooth, frame-rate independent updates
-    auto currentTime = std::chrono::high_resolution_clock::now();
-    m_deltaTime = std::chrono::duration<float>(currentTime - m_lastFrameTime).count();
-    m_lastFrameTime = currentTime;
+  // Simple event loop
+  while (!m_windowManager->shouldClose()) {
+    m_windowManager->pollEvents();
 
-    // Update total time since engine started
-    m_totalTime = std::chrono::duration<float>(currentTime - m_engineStartTime).count();
+    // Keep showing blue screen
+    glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
 
-    // Process all pending window events (keyboard, mouse, window operations)
-    processEvents();
+    glUseProgram(shaderProgram);
+    glBindVertexArray(vao);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
 
-    // Only update and render if we're not paused
-    if (!m_isPaused) {
-      // Update all game systems with the calculated delta time
-      // updateSystems(m_deltaTime);
-      // Render the current frame
-      glClearColor(0.3f, 0.1f, 0.8f, 1.0f);
-      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-      // renderFrame();
-      glBindVertexArray(vao);
-      glUseProgram(shaderProgram);
-      glDrawArrays(GL_TRIANGLES, 0, 3);
-
-      // Update frame statistics for performance monitoring
-      // calculateFrameStats();
-    }
-    // TODO: Create Scene class
-    // Handle scene transitions if needed
-    // performSceneTransition();
+    m_windowManager->swapBuffers();
   }
 
+  // Main engine loop - this is the heart of your game engine
+  // while (m_isRunning && !m_windowManager->shouldClose()) {
+  //   // Caculate time since last frame for smooth, frame-rate independent updates
+  //   auto currentTime = std::chrono::high_resolution_clock::now();
+  //   m_deltaTime = std::chrono::duration<float>(currentTime - m_lastFrameTime).count();
+  //   m_lastFrameTime = currentTime;
+  //
+  //   // Update total time since engine started
+  //   m_totalTime = std::chrono::duration<float>(currentTime - m_engineStartTime).count();
+  //
+  //   // Process all pending window events (keyboard, mouse, window operations)
+  //   // processEvents();
+  //
+  //   // Only update and render if we're not paused
+  //   if (!m_isPaused) {
+  //     // Update all game systems with the calculated delta time
+  //     // updateSystems(m_deltaTime);
+  //     // Render the current frame
+  //     // renderFrame();
+  //
+  //     // Update frame statistics for performance monitoring
+  //     calculateFrameStats();
+  //   }
+  //   // TODO: Create Scene class
+  //   // Handle scene transitions if needed
+  //   // performSceneTransition();
+  // }
+
   LOG_INFO("[Engine] Main engine loop ended");
+}
+
+void Engine::rbTest() {
+  if (!m_isInitialized) {
+    LOG_ERROR("[Engine] Cannot run - engine not initialized!");
+    return;
+  }
+
+  LOG_INFO("[Engine] Starting minimal triangle test...");
+
+  // Make sure OpenGL context is current
+  m_windowManager->makeContextCurrent();
+
+  // Test if OpenGL is working AT ALL
+  glClearColor(1.0f, 0.0f, 0.0f, 1.0f);  // RED background
+  glClear(GL_COLOR_BUFFER_BIT);
+  m_windowManager->swapBuffers();
+
+  LOG_INFO("[Engine] Red screen test - do you see a red background? (waiting 2 seconds)");
+
+  // Wait 2 seconds so you can see the red screen
+  auto start = std::chrono::high_resolution_clock::now();
+  while (std::chrono::duration<float>(std::chrono::high_resolution_clock::now() - start).count() < 2.0f) {
+    m_windowManager->pollEvents();
+    if (m_windowManager->shouldClose())
+      return;
+  }
+
+  // If you see red background, OpenGL is working. If not, that's the problem!
+
+  LOG_INFO("[Engine] Now testing blue background...");
+  glClearColor(0.0f, 0.0f, 1.0f, 1.0f);  // BLUE background
+  glClear(GL_COLOR_BUFFER_BIT);
+  m_windowManager->swapBuffers();
+
+  // Wait another 2 seconds
+  start = std::chrono::high_resolution_clock::now();
+  while (std::chrono::duration<float>(std::chrono::high_resolution_clock::now() - start).count() < 2.0f) {
+    m_windowManager->pollEvents();
+    if (m_windowManager->shouldClose())
+      return;
+  }
+
+  LOG_INFO("[Engine] If you saw red then blue, OpenGL clearing works!");
+  LOG_INFO("[Engine] Press ESC or close window to exit");
+
+  // Simple event loop
+  while (!m_windowManager->shouldClose()) {
+    m_windowManager->pollEvents();
+
+    // Keep showing blue screen
+    glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+    m_windowManager->swapBuffers();
+  }
 }
 
 void Engine::processEvents() {

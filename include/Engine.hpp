@@ -144,6 +144,7 @@ public:
   // Core engine lifecycle - the main interface for using the engine
   bool initialize();
   void run();
+  void rbTest();
   void shutdown();
   void pause();
   void resume();
