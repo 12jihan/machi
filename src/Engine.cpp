@@ -125,6 +125,7 @@ bool Engine::initializeWindowSystem() {
   return true;
 };
 
+// TODO: extend the renderer class
 // bool Engine::intializeRenderingSystem() {
 //   LOG_INFO("[Engine] Initializing rendering system...");
 //   // Set up basic OpenGL state based on our configuration
@@ -289,8 +290,11 @@ void Engine::run() {
   m_isRunning = true;
   m_lastFrameTime = std::chrono::high_resolution_clock::now();
 
-  // Make outlined
-  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  // set wireframe mode for testing (like your current setup)
+  // TODO: Render class needs to be extended
+  // if (m_renderer) {
+  //   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  // }
   // Main engine, loop - this is the heart of your game engine
   while (m_isRunning && !m_windowManager->shouldClose()) {
     // Caculate time since last frame for smooth, frame-rate independent updates
@@ -309,19 +313,9 @@ void Engine::run() {
       // Update all game systems with the calculated delta time
       updateSystems(m_deltaTime);
 
-      // Keep showing blue screen
-      glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
-      glClear(GL_COLOR_BUFFER_BIT);
-
-      glUseProgram(shaderProgram);
-      glBindVertexArray(vao);
-      glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
-      glBindVertexArray(0);
-
-      // Would normally be in renderFrame() but gonna be here for testing
-      m_windowManager->swapBuffers();
       // Render the current frame
-      // renderFrame();
+      renderFrame();
+
       // Update frame statistics for performance monitoring
       calculateFrameStats();
     }
