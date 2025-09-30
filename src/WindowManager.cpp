@@ -1,16 +1,21 @@
 #include "../include/WindowManager.hpp"
 #include <GLFW/glfw3.h>
 #include "../include/Logger.hpp"
-#include <iostream>
 #include <stdexcept>
-#include <cstring>
 
 static bool s_glfwInitialized = false;
 static int s_windowCount = 0;
 
-WindowManager::WindowManager(const WindowConfig& config) : m_window(nullptr), m_config(config), m_isInitialized(false), m_isFullscreen(false), m_windowedSize{config.width, config.height}, m_windowedPos{100, 100} {}
+WindowManager::WindowManager(const WindowConfig& config) :
+ m_window(nullptr),
+ m_config(config),
+ m_isInitialized(false),
+ m_isFullscreen(false),
+ m_windowedSize{config.width, config.height},
+ m_windowedPos{100, 100} {}
 
-WindowManager::WindowManager(const std::string& title, int width, int height) : WindowManager(WindowConfig{title, width, height}) {}
+WindowManager::WindowManager(const std::string& title, int width, int height) :
+ WindowManager(WindowConfig{title, width, height}) {}
 
 WindowManager::~WindowManager() {
   shutdown();
@@ -70,12 +75,12 @@ bool WindowManager::initialize() {
     m_isInitialized = true;
 
     LOG_INFO_F(
-        "[WindowManager] Window created successfully: \n\t+ Title: {} \n\t+(width: {}, "
-        "height: "
-        "{})",
-        m_config.title,
-        m_config.width,
-        m_config.height);
+      "[WindowManager] Window created successfully: \n\t+ Title: {} \n\t+(width: {}, "
+      "height: "
+      "{})",
+      m_config.title,
+      m_config.width,
+      m_config.height);
     return true;
   } catch (const std::exception& e) {
     LOG_INFO_F("[WindowManager] Initialization failed: {}", e.what());
@@ -108,7 +113,7 @@ bool WindowManager::initialize() {
 void WindowManager::setupWindowHints() {
   // OpenGL version and profile
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, m_config.glMajorVersion);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, m_config.glMinorVersion);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, m_config.glMinorVersion);
 
   if (m_config.glCoreProfile) {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -120,6 +125,7 @@ void WindowManager::setupWindowHints() {
 #endif
 
   // Window properties
+  // glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);
   glfwWindowHint(GLFW_RESIZABLE, m_config.resizable ? GLFW_TRUE : GLFW_FALSE);
   glfwWindowHint(GLFW_DECORATED, m_config.decorated ? GLFW_TRUE : GLFW_FALSE);
 
@@ -151,6 +157,7 @@ bool WindowManager::initializeGLAD() {
   return true;
 }
 
+// BUG: Some how this doesn't work
 void WindowManager::centerWindow() {
   if (!m_window)
     return;
@@ -287,6 +294,7 @@ std::array<int, 2> WindowManager::getFramebufferSize() const {
   return getSize();
 }
 
+// TODO: Fix fullscreen
 void WindowManager::setFullscreen(bool fullscreen) {
   if (!m_window || m_isFullscreen == fullscreen) {
     return;
@@ -307,12 +315,14 @@ void WindowManager::setFullscreen(bool fullscreen) {
     glfwSetWindowMonitor(m_window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
   } else {
     // Restore windowed mode
-    glfwSetWindowMonitor(m_window, nullptr, m_windowedPos[0], m_windowedPos[1], m_windowedSize[0], m_windowedSize[1], 0);
+    glfwSetWindowMonitor(
+      m_window, nullptr, m_windowedPos[0], m_windowedPos[1], m_windowedSize[0], m_windowedSize[1], 0);
   }
 
   m_isFullscreen = fullscreen;
 }
 
+// TODO: Fix fullscreen
 void WindowManager::toggleFullscreen() {
   setFullscreen(!m_isFullscreen);
 }
@@ -354,4 +364,27 @@ std::array<int, 2> WindowManager::getPrimaryMonitorSize() const {
   GLFWmonitor* monitor = glfwGetPrimaryMonitor();
   const GLFWvidmode* mode = glfwGetVideoMode(monitor);
   return {mode->width, mode->height};
+}
+
+std::array<int, 2> WindowManager::getPrimaryMonitorWorkArea() const {
+  GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+  if (!monitor) {
+    return {0, 0};
+  }
+
+  // Get the work area (desktop area minus taskbars, docks, etc.)
+  int x, y, width, height;
+  glfwGetMonitorWorkarea(monitor, &x, &y, &width, &height);
+  return {width, height};
+}
+
+std::array<int, 2> WindowManager::getPosition() const {
+  if (!m_window) {
+    // Return default position if window doesn't exist
+    return {0, 0};
+  }
+
+  int x, y;
+  glfwGetWindowPos(m_window, &x, &y);
+  return {x, y};
 }

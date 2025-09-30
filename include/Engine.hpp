@@ -1,5 +1,6 @@
 #pragma once
 #include <chrono>
+#include <memory>
 #include <string>
 #include "WindowManager.hpp"
 
@@ -31,7 +32,16 @@ struct EngineConfig {
 };
 
 // Event system - allows different parts of the engine to communicate
-enum class EngineEventType { WindowResize, WindowClose, KeyPress, KeyRelease, MousePress, MouseRelease, MouseMove, EngineShutdown };
+enum class EngineEventType {
+  WindowResize,
+  WindowClose,
+  KeyPress,
+  KeyRelease,
+  MousePress,
+  MouseRelease,
+  MouseMove,
+  EngineShutdown
+};
 
 struct EngineEvent {
   EngineEventType type;
@@ -69,7 +79,7 @@ private:
   std::unique_ptr<WindowManager> m_windowManager;
 
   // Timing sustem for smooth frame rates and delta time calculation
-  std::chrono::high_resolution_clock::time_point m_lastFramTime;
+  std::chrono::high_resolution_clock::time_point m_lastFrameTime;
   std::chrono::high_resolution_clock::time_point m_engineStartTime;
   float m_deltaTime;
   float m_totalTime;
@@ -81,6 +91,7 @@ private:
   std::vector<EventHandler> m_eventHandlers;
   std::vector<EngineEvent> m_eventQueue;
 
+  // TODO: Create SceneManager
   // Scene management - this will hold your game's current state
   // std::unique_ptr<Scene> m_currentScene;
   // std::unique_ptr<Scene> m_nextScene;  // For scene transitions
@@ -92,10 +103,10 @@ private:
   bool initializeAudioSystem();  // For future expansion
 
   void processEvents();
-  void updateSustems(float deltaTime);
+  void updateSystems(float deltaTime);
   void renderFrame();
   void calculateFrameStats();
-  void udpateWindowTitle();
+  void updateWindowTitle();
 
   // Window event callbacks - these bridge WindowManager events to our event system
   void onWindowResize(int width, int height);
@@ -133,6 +144,7 @@ public:
   // Core engine lifecycle - the main interface for using the engine
   bool initialize();
   void run();
+  void rbTest();
   void shutdown();
   void pause();
   void resume();
@@ -167,4 +179,46 @@ public:
   const WindowManager& getWindowManager() const {
     return *m_windowManager;
   }
+
+  std::array<int, 2> getWindowSize() const;
+  void setWindowSize(int width, int height);
+  void setWindowTitle(const std::string&);
+  void toggleFullscreen();
+  bool isFullscreen() const;
+
+  // TODO: Create SceneManager
+  // Scene management - this is how you'll organize your game content
+  // void setScene(std::unique_ptr<Scene> scene);
+  // void transition(std::unique_ptr<Scene> scene);
+  // Scene* getCurrentScene() const { return m)_currentScene.get();};
+
+  // Event system interface - allows other systems to respond to engine events
+  void addEventListener(const EventHandler& handler);
+  void removeEventListener(const EventHandler& handler);
+  void postEvent(const EventHandler& handler);
+
+  // Configuration access - allows runtime modification of engine behavior
+  const EngineConfig& getConfig() const {
+    return m_config;
+  }
+  void updateConfig(const EngineConfig& newConfig);
+
+  // Utility methods for common engine operations
+  void requestShutdown() {
+    m_isRunning = false;
+  }
+  void setClearColor(float r, float g, float b, float a);
+  void enableDepthTest(bool enable);
+  void enableBlending(bool enable);
+  void enableVSync(bool enable);
+
+  // Debug and profiling helpers
+  void printSystemInfo() const;
+  void printFrameStats() const;
+
+  // Static utility methods
+  static std::string getEngineVersion() {
+    return "1.0.0";
+  }
+  static std::string getBuildInfo();  // Implementation will include compile time, OpengGL version, etc.
 };

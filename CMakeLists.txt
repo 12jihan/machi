@@ -26,6 +26,7 @@ set(APP_SRC
   src/Engine.cpp
   src/Scene.cpp
   src/Logger.cpp
+  src/InputManager.cpp
 )
 
 # Create your executable
