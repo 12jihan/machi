@@ -21,6 +21,7 @@ machi
 # Debug files
 *.dSYM/
 *.pdb
+*.log
 
 # IDE files
 .vscode/
