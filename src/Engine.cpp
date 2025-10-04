@@ -103,6 +103,7 @@ bool Engine::initializeWindowSystem() {
   windowConfig.samples = m_config.msaaSamples;
 
   m_windowManager = std::make_unique<WindowManager>(windowConfig);
+
   if (!m_windowManager->initialize()) {
     LOG_ERROR("[Engine] Failed to initialize WindowManager");
     return false;
@@ -126,20 +127,20 @@ bool Engine::initializeWindowSystem() {
 };
 
 // TODO: extend the renderer class
-// bool Engine::intializeRenderingSystem() {
-//   LOG_INFO("[Engine] Initializing rendering system...");
-//   // Set up basic OpenGL state based on our configuration
-//   setClearColor(m_config.clearR, m_config.clearG, m_config.clearB, m_config.clearA);
-//   enableDepthTest(m_config.enableDepthTest);
-//   enableBlending(m_config.enableBlending);
-//
-//   // Set initial viewport to match window size
-//   auto [width, height] = m_windowManager->getSize();
-//   glViewport(0, 0, width, height);
-//
-//   LOG_INFO("[Engine] Rendering system initialized successfully");
-//   return true;
-// }
+bool Engine::initializeRenderingSystem() {
+  LOG_INFO("[Engine] Initializing rendering system...");
+  // Set up basic OpenGL state based on our configuration
+  setClearColor(m_config.clearR, m_config.clearG, m_config.clearB, m_config.clearA);
+  enableDepthTest(m_config.enableDepthTest);
+  enableBlending(m_config.enableBlending);
+
+  // Set initial viewport to match window size
+  auto [width, height] = m_windowManager->getSize();
+  glViewport(0, 0, width, height);
+
+  LOG_INFO("[Engine] Rendering system initialized successfully");
+  return true;
+}
 
 bool Engine::initializeInputSystem() {
   LOG_INFO("[Engine] Initializing input system...");
@@ -283,19 +284,23 @@ void Engine::run() {
 
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
   glEnableVertexAttribArray(0);
-
   // INFO: --> Shader test ends here
 
-  LOG_INFO("[Engine] startiing main engine loop...");
+  LOG_INFO("[Engine] starting main engine loop...");
   m_isRunning = true;
   m_lastFrameTime = std::chrono::high_resolution_clock::now();
 
-  // set wireframe mode for testing (like your current setup)
-  // TODO: Render class needs to be extended
-  // if (m_renderer) {
-  //   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-  // }
   // Main engine, loop - this is the heart of your game engine
+  LOG_INFO_F("[ENGINE] m_isPaused {}", m_isPaused);
+  if (false) {
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  }
+
+  // Check how many attributes are available
+  int nrAttributes;
+  glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
+  LOG_INFO_F("Max vertex attributes supported: {}", nrAttributes);
+
   while (m_isRunning && !m_windowManager->shouldClose()) {
     // Caculate time since last frame for smooth, frame-rate independent updates
     auto currentTime = std::chrono::high_resolution_clock::now();
@@ -306,19 +311,25 @@ void Engine::run() {
     m_totalTime = std::chrono::duration<float>(currentTime - m_engineStartTime).count();
 
     // Process all pending window events (keyboard, mouse, window operations)
-    processEvents();
+    // processEvents();
 
     // Only update and render if we're not paused
-    if (!m_isPaused) {
-      // Update all game systems with the calculated delta time
-      updateSystems(m_deltaTime);
+    // if (!m_isPaused) {
+    glUseProgram(shaderProgram);
+    glBindVertexArray(vao);
+    glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
+    // Update all game systems with the calculated delta time
+    // updateSystems(m_deltaTime);
+    m_windowManager->swapBuffers();
+    m_windowManager->pollEvents();
 
-      // Render the current frame
-      renderFrame();
+    // Render the current frame
+    // renderFrame();
 
-      // Update frame statistics for performance monitoring
-      calculateFrameStats();
-    }
+    // Update frame statistics for performance monitoring
+    calculateFrameStats();
+    // }
     // TODO: Create Scene class
     // Handle scene transitions if needed
     // performSceneTransition();

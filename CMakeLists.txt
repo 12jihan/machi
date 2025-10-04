@@ -23,10 +23,10 @@ file(GLOB GLAD_SRC "${CMAKE_CURRENT_SOURCE_DIR}/lib/glad/src/*.c")
 set(APP_SRC
   src/main.cpp
   src/WindowManager.cpp
-  # src/Engine.cpp
+  src/Engine.cpp
   # src/Scene.cpp
-  # src/Logger.cpp
-  # src/InputManager.cpp
+  src/Logger.cpp
+  src/InputManager.cpp
 )
 
 # Create your executable
