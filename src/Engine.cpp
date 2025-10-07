@@ -1,5 +1,6 @@
 #include "../include/Engine.hpp"
 #include "../include/Logger.hpp"
+#include "../include/Shader.hpp"
 #include <GLFW/glfw3.h>
 #include <chrono>
 #include <iomanip>
@@ -185,25 +186,32 @@ void Engine::run() {
   }
 
   // INFO: --> Shader test starts here
-  const char* vShaderSrc = R"(
-    #version 330 core
-    layout (location = 0) in vec3 aPos;
+  Shader shader;
+  std::string vShaderLoader = shader.loadFile("../shaders/main.vert.glsl");
+  const char* vShaderSrc = vShaderLoader.c_str();
 
-    void main()
-    {
-      gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0f);
-    }
-  )";
+  std::string fShaderLoader = shader.loadFile("../shaders/main.vert.glsl");
+  const char* fShaderSrc = fShaderLoader.c_str();
 
-  const char* fShaderSrc = R"(
-    #version 330 core
-    out vec4 FragColor;
+  // const char* vShaderSrc = R"(
+  //   #version 330 core
+  //   layout (location = 0) in vec3 aPos;
+  //
+  //   void main()
+  //   {
+  //     gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0f);
+  //   }
+  // )";
 
-    void main()
-    {
-      FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
-    }
-  )";
+  // const char* fShaderSrc = R"(
+  //   #version 330 core
+  //   out vec4 FragColor;
+  //
+  //   void main()
+  //   {
+  //     FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
+  //   }
+  // )";
 
   int success;
   char infoLog[512];
@@ -311,7 +319,7 @@ void Engine::run() {
     m_totalTime = std::chrono::duration<float>(currentTime - m_engineStartTime).count();
 
     // Process all pending window events (keyboard, mouse, window operations)
-    // processEvents();
+    processEvents();
 
     // Only update and render if we're not paused
     // if (!m_isPaused) {
@@ -321,11 +329,11 @@ void Engine::run() {
     glBindVertexArray(0);
     // Update all game systems with the calculated delta time
     // updateSystems(m_deltaTime);
-    m_windowManager->swapBuffers();
-    m_windowManager->pollEvents();
 
     // Render the current frame
     // renderFrame();
+
+    m_windowManager->swapBuffers();
 
     // Update frame statistics for performance monitoring
     calculateFrameStats();
@@ -417,6 +425,7 @@ void Engine::updateSystems(float deltaTime) {
 };
 
 void Engine::renderFrame() {
+  LOG_INFO("[Engine] running renderer");
   // Clear the screen with our configured background color
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

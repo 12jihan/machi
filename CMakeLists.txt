@@ -8,6 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Generate compile_commands.json for LSP support (LazyVim, clangd, etc.)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_BUILD_TYPE Debug)
 
 # Find required packages
 find_package(glfw3 REQUIRED)
@@ -24,7 +25,7 @@ set(APP_SRC
   src/main.cpp
   src/WindowManager.cpp
   src/Engine.cpp
-  # src/Scene.cpp
+  src/Shader.cpp
   src/Logger.cpp
   src/InputManager.cpp
 )
