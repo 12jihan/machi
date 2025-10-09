@@ -190,7 +190,7 @@ void Engine::run() {
   std::string vShaderLoader = shader.loadFile("../shaders/main.vert.glsl");
   const char* vShaderSrc = vShaderLoader.c_str();
 
-  std::string fShaderLoader = shader.loadFile("../shaders/main.vert.glsl");
+  std::string fShaderLoader = shader.loadFile("../shaders/main.frag.glsl");
   const char* fShaderSrc = fShaderLoader.c_str();
 
   int success;
