@@ -206,7 +206,7 @@ void Engine::run() {
   glGetShaderiv(vShader, GL_COMPILE_STATUS, &success);
   if (!success) {
     glGetShaderInfoLog(vShader, 512, nullptr, infoLog);
-    LOG_ERROR_F("[Engine] there was an error with the vShader: {}", infoLog);
+    LOG_ERROR_F("[Engine]::[Shader] there was an error with the vShader: {}", infoLog);
   };
 
   // fshader
@@ -219,7 +219,7 @@ void Engine::run() {
   glGetShaderiv(fShader, GL_COMPILE_STATUS, &success);
   if (!success) {
     glGetShaderInfoLog(fShader, 512, nullptr, infoLog);
-    LOG_ERROR_F("[Engine] there was an error with the fShader: {}", infoLog);
+    LOG_ERROR_F("[Engine]::[Shader] there was an error with the fShader: {}", infoLog);
   };
 
   // Shader program
@@ -233,7 +233,7 @@ void Engine::run() {
   glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
   if (!success) {
     glGetProgramInfoLog(shaderProgram, 512, nullptr, infoLog);
-    LOG_ERROR_F("[Engine] there was an error with the shader program: {}", infoLog);
+    LOG_ERROR_F("[Engine]::[Shader] there was an error with the shader program: {}", infoLog);
   }
 
   // Delete the shaders when don't using program?
@@ -243,19 +243,16 @@ void Engine::run() {
   // VAOs, VBOs, EBOs
   // float vertices[] = {-0.5f, -0.5f, 0.0f, 0.5f, -0.5f, 0.0f, 0.0f, 0.5f, 0.0f};
   // clang-format off
-  float vertices[] = {
-     0.5f,  0.5f,  0.0f,  // top right
-     0.5f, -0.5f,  0.0f,  // bottom right
-    -0.5f, -0.5f,  0.0f,  // bottom left
-    -0.5f, 0.5f, 0.0f,  // top left
-    0.0f, 0.0f, 0.0f   // center point 
-  };
-  unsigned int indices[] = {  // note that we start from 0!
-    0, 1,   4,    // first triangle 
-    1, 2,   4,    // second triangle
-    2, 3,   4,    // third triangle
-    3,0,  4,    // fourth triangle
-  };
+    float vertices[] = {
+      0.5f,  0.5f, 0.0f,  // top right
+      0.5f, -0.5f, 0.0f,  // bottom right
+     -0.5f, -0.5f, 0.0f,  // bottom left
+     -0.5f, 0.5f,0.0f   // top left 
+    };
+    unsigned int indices[] = {  // note that we start from 0!
+      0, 1, 3,   // first triangle
+      1, 2, 3    // second triangle
+    };
 
   // clang-format on
   unsigned int vao, vbo, ebo;
@@ -275,12 +272,12 @@ void Engine::run() {
   glEnableVertexAttribArray(0);
   // INFO: --> Shader test ends here
 
-  LOG_INFO("[Engine] starting main engine loop...");
+  LOG_INFO("[ENGINE] starting main engine loop...");
   m_isRunning = true;
   m_lastFrameTime = std::chrono::high_resolution_clock::now();
 
   // Main engine, loop - this is the heart of your game engine
-  LOG_INFO_F("[ENGINE] m_isPaused {}", m_isPaused);
+  LOG_INFO_F("[Engine]::[Shader] m_isPaused {}", m_isPaused);
   if (false) {
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   }
@@ -288,7 +285,7 @@ void Engine::run() {
   // Check how many attributes are available
   int nrAttributes;
   glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
-  LOG_INFO_F("Max vertex attributes supported: {}", nrAttributes);
+  LOG_INFO_F("[Engine]::[Shader] Max vertex attributes supported: {}", nrAttributes);
 
   while (m_isRunning && !m_windowManager->shouldClose()) {
     // Caculate time since last frame for smooth, frame-rate independent updates
@@ -306,7 +303,7 @@ void Engine::run() {
     // if (!m_isPaused) {
     glUseProgram(shaderProgram);
     glBindVertexArray(vao);
-    glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
     // Update all game systems with the calculated delta time
     // updateSystems(m_deltaTime);
