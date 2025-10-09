@@ -193,26 +193,6 @@ void Engine::run() {
   std::string fShaderLoader = shader.loadFile("../shaders/main.vert.glsl");
   const char* fShaderSrc = fShaderLoader.c_str();
 
-  // const char* vShaderSrc = R"(
-  //   #version 330 core
-  //   layout (location = 0) in vec3 aPos;
-  //
-  //   void main()
-  //   {
-  //     gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0f);
-  //   }
-  // )";
-
-  // const char* fShaderSrc = R"(
-  //   #version 330 core
-  //   out vec4 FragColor;
-  //
-  //   void main()
-  //   {
-  //     FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
-  //   }
-  // )";
-
   int success;
   char infoLog[512];
 
@@ -271,11 +251,12 @@ void Engine::run() {
     0.0f, 0.0f, 0.0f   // center point 
   };
   unsigned int indices[] = {  // note that we start from 0!
-    0, 1,   4,   // first triangle 
-    1, 2,   4,   // second triangle
-    2, 3,   4,   // third triangle
+    0, 1,   4,    // first triangle 
+    1, 2,   4,    // second triangle
+    2, 3,   4,    // third triangle
     3,0,  4,    // fourth triangle
   };
+
   // clang-format on
   unsigned int vao, vbo, ebo;
   glGenVertexArrays(1, &vao);
