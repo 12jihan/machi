@@ -7,6 +7,7 @@
 #include <memory>
 #include <sstream>
 #include <string>
+#include <cmath>
 
 Engine::Engine(const EngineConfig& config) :
  m_config(config),
@@ -241,14 +242,19 @@ void Engine::run() {
   glDeleteShader(fShader);
 
   // VAOs, VBOs, EBOs
-  // float vertices[] = {-0.5f, -0.5f, 0.0f, 0.5f, -0.5f, 0.0f, 0.0f, 0.5f, 0.0f};
   // clang-format off
-    float vertices[] = {
-      0.5f,  0.5f, 0.0f,  // top right
-      0.5f, -0.5f, 0.0f,  // bottom right
-     -0.5f, -0.5f, 0.0f,  // bottom left
-     -0.5f, 0.5f,0.0f   // top left 
-    };
+  float vertices[] = {
+    -0.5f, -0.5f, 0.0f,
+    0.5f, -0.5f, 0.0f,
+    0.0f, 0.5f, 0.0f
+  };
+   
+  //   float vertices[] = {
+  // 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
+  // -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
+  // 0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f,
+  //   };
+
     unsigned int indices[] = {  // note that we start from 0!
       0, 1, 3,   // first triangle
       1, 2, 3    // second triangle
@@ -258,18 +264,22 @@ void Engine::run() {
   unsigned int vao, vbo, ebo;
   glGenVertexArrays(1, &vao);
   glGenBuffers(1, &vbo);
-  glGenBuffers(1, &ebo);
+  // glGenBuffers(1, &ebo);
 
   glBindVertexArray(vao);
 
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+  // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+  // glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
+  // position attribute
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
   glEnableVertexAttribArray(0);
+
+  // color attribute
+  // glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
   // INFO: --> Shader test ends here
 
   LOG_INFO("[ENGINE] starting main engine loop...");
@@ -301,7 +311,11 @@ void Engine::run() {
 
     // Only update and render if we're not paused
     // if (!m_isPaused) {
+    float greenValue = (std::sin(m_totalTime) / 2.0f) + 0.5f;
+    int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
     glUseProgram(shaderProgram);
+    glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+
     glBindVertexArray(vao);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
@@ -322,61 +336,6 @@ void Engine::run() {
   }
 
   LOG_INFO("[Engine] Main engine loop ended");
-}
-
-void Engine::rbTest() {
-  if (!m_isInitialized) {
-    LOG_ERROR("[Engine] Cannot run - engine not initialized!");
-    return;
-  }
-
-  LOG_INFO("[Engine] Starting minimal triangle test...");
-
-  // Make sure OpenGL context is current
-  m_windowManager->makeContextCurrent();
-
-  // Test if OpenGL is working AT ALL
-  glClearColor(1.0f, 0.0f, 0.0f, 1.0f);  // RED background
-  glClear(GL_COLOR_BUFFER_BIT);
-  m_windowManager->swapBuffers();
-
-  LOG_INFO("[Engine] Red screen test - do you see a red background? (waiting 2 seconds)");
-
-  // Wait 2 seconds so you can see the red screen
-  auto start = std::chrono::high_resolution_clock::now();
-  while (std::chrono::duration<float>(std::chrono::high_resolution_clock::now() - start).count() < 2.0f) {
-    m_windowManager->pollEvents();
-    if (m_windowManager->shouldClose())
-      return;
-  }
-
-  // If you see red background, OpenGL is working. If not, that's the problem!
-
-  LOG_INFO("[Engine] Now testing blue background...");
-  glClearColor(0.0f, 0.0f, 1.0f, 1.0f);  // BLUE background
-  glClear(GL_COLOR_BUFFER_BIT);
-  m_windowManager->swapBuffers();
-
-  // Wait another 2 seconds
-  start = std::chrono::high_resolution_clock::now();
-  while (std::chrono::duration<float>(std::chrono::high_resolution_clock::now() - start).count() < 2.0f) {
-    m_windowManager->pollEvents();
-    if (m_windowManager->shouldClose())
-      return;
-  }
-
-  LOG_INFO("[Engine] If you saw red then blue, OpenGL clearing works!");
-  LOG_INFO("[Engine] Press ESC or close window to exit");
-
-  // Simple event loop
-  while (!m_windowManager->shouldClose()) {
-    m_windowManager->pollEvents();
-
-    // Keep showing blue screen
-    glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
-    m_windowManager->swapBuffers();
-  }
 }
 
 void Engine::processEvents() {
