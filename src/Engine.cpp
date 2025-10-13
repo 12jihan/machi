@@ -188,11 +188,11 @@ void Engine::run() {
 
   // INFO: --> Shader test starts here
   Shader shader;
-  std::string vShaderLoader = shader.loadFile("../shaders/main.vert.glsl");
-  const char* vShaderSrc = vShaderLoader.c_str();
+  std::string vShaderSource = shader.loadFile("../shaders/main.vert.glsl");
+  const char* vShaderSrc = vShaderSource.c_str();
 
-  std::string fShaderLoader = shader.loadFile("../shaders/main.frag.glsl");
-  const char* fShaderSrc = fShaderLoader.c_str();
+  std::string fShaderSource = shader.loadFile("../shaders/main.frag.glsl");
+  const char* fShaderSrc = fShaderSource.c_str();
 
   int success;
   char infoLog[512];
@@ -202,8 +202,6 @@ void Engine::run() {
   vShader = glCreateShader(GL_VERTEX_SHADER);
   glShaderSource(vShader, 1, &vShaderSrc, nullptr);
   glCompileShader(vShader);
-
-  // Check error for vshader
   glGetShaderiv(vShader, GL_COMPILE_STATUS, &success);
   if (!success) {
     glGetShaderInfoLog(vShader, 512, nullptr, infoLog);
@@ -215,8 +213,6 @@ void Engine::run() {
   fShader = glCreateShader(GL_FRAGMENT_SHADER);
   glShaderSource(fShader, 1, &fShaderSrc, nullptr);
   glCompileShader(fShader);
-
-  // Check error for fshader
   glGetShaderiv(fShader, GL_COMPILE_STATUS, &success);
   if (!success) {
     glGetShaderInfoLog(fShader, 512, nullptr, infoLog);
@@ -229,15 +225,13 @@ void Engine::run() {
   glAttachShader(shaderProgram, vShader);
   glAttachShader(shaderProgram, fShader);
   glLinkProgram(shaderProgram);
-
-  // Check error for shader program
   glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
   if (!success) {
     glGetProgramInfoLog(shaderProgram, 512, nullptr, infoLog);
     LOG_ERROR_F("[Engine]::[Shader] there was an error with the shader program: {}", infoLog);
   }
 
-  // Delete the shaders when don't using program?
+  // Delete the shaders
   glDeleteShader(vShader);
   glDeleteShader(fShader);
 
@@ -261,18 +255,14 @@ void Engine::run() {
     };
 
   // clang-format on
-  unsigned int vao, vbo, ebo;
+  unsigned int vao, vbo;
   glGenVertexArrays(1, &vao);
   glGenBuffers(1, &vbo);
-  // glGenBuffers(1, &ebo);
 
   glBindVertexArray(vao);
 
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-  // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-  // glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
   // position attribute
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
@@ -317,7 +307,8 @@ void Engine::run() {
     glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
 
     glBindVertexArray(vao);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+    // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
     // Update all game systems with the calculated delta time
     // updateSystems(m_deltaTime);
