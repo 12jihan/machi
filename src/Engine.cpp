@@ -237,21 +237,16 @@ void Engine::run() {
 
   // VAOs, VBOs, EBOs
   // clang-format off
-  float vertices[] = {
-    -0.5f, -0.5f, 0.0f,
-    0.5f, -0.5f, 0.0f,
-    0.0f, 0.5f, 0.0f
-  };
+  // float vertices[] = {
+  //   -0.5f, -0.5f, 0.0f,
+  //   0.5f, -0.5f, 0.0f,
+  //   0.0f, 0.5f, 0.0f
+  // };
    
-  //   float vertices[] = {
-  // 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
-  // -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
-  // 0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f,
-  //   };
-
-    unsigned int indices[] = {  // note that we start from 0!
-      0, 1, 3,   // first triangle
-      1, 2, 3    // second triangle
+    float vertices[] = {
+  0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
+  -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
+  0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f,
     };
 
   // clang-format on
@@ -265,11 +260,13 @@ void Engine::run() {
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
   // position attribute
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), nullptr);
   glEnableVertexAttribArray(0);
 
   // color attribute
-  // glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), reinterpret_cast<void*>(3 * sizeof(float)));
+  glEnableVertexAttribArray(1);
+
   // INFO: --> Shader test ends here
 
   LOG_INFO("[ENGINE] starting main engine loop...");
