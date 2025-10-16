@@ -244,9 +244,10 @@ void Engine::run() {
   // };
    
     float vertices[] = {
-  0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
-  -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
-  0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f,
+    // positions         // colors
+     0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   // bottom right
+    -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   // bottom left
+     0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f    // top
     };
 
   // clang-format on
@@ -298,14 +299,9 @@ void Engine::run() {
 
     // Only update and render if we're not paused
     // if (!m_isPaused) {
-    float greenValue = (std::sin(m_totalTime) / 2.0f) + 0.5f;
-    int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
     glUseProgram(shaderProgram);
-    glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
-
     glBindVertexArray(vao);
     glDrawArrays(GL_TRIANGLES, 0, 3);
-    // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
     // Update all game systems with the calculated delta time
     // updateSystems(m_deltaTime);
