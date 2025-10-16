@@ -7,8 +7,18 @@
 class Shader {
 private:
 public:
-  // Shader();
-  // ~Shader();
+  unsigned int ID;
+
+  // constructor reads and builds the shader
+  Shader(const char* vPath, const char* fPath);
+
+  // use/activate the shader
+  void use();
+
+  // utility uniform functions
+  void setBool(const std::string& name, bool value) const;
+  void setInt(const std::string& name, int value) const;
+  void setFloat(const std::string& name, float value) const;
 
   std::string loadFile(const std::string& filepath);
 };

@@ -1,13 +1,14 @@
 #include "../include/Engine.hpp"
 #include "../include/Logger.hpp"
-#include "../include/Shader.hpp"
+// #include "../include/Shader.hpp"
+#include "../include/Utils.hpp"
+
 #include <GLFW/glfw3.h>
 #include <chrono>
 #include <iomanip>
 #include <memory>
 #include <sstream>
 #include <string>
-#include <cmath>
 
 Engine::Engine(const EngineConfig& config) :
  m_config(config),
@@ -187,11 +188,11 @@ void Engine::run() {
   }
 
   // INFO: --> Shader test starts here
-  Shader shader;
-  std::string vShaderSource = shader.loadFile("../shaders/main.vert.glsl");
+  // Shader shader;
+  std::string vShaderSource = Utils::loadFile("../shaders/main.vert.glsl");
   const char* vShaderSrc = vShaderSource.c_str();
 
-  std::string fShaderSource = shader.loadFile("../shaders/main.frag.glsl");
+  std::string fShaderSource = Utils::loadFile("../shaders/main.frag.glsl");
   const char* fShaderSrc = fShaderSource.c_str();
 
   int success;

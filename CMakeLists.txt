@@ -28,6 +28,7 @@ set(APP_SRC
   src/Shader.cpp
   src/Logger.cpp
   src/InputManager.cpp
+  src/Utils.cpp
 )
 
 # Create your executable
