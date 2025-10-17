@@ -7,7 +7,7 @@
 class Shader {
 private:
 public:
-  unsigned int ID;
+  unsigned int m_id;
 
   // constructor reads and builds the shader
   Shader(const char* vPath, const char* fPath);

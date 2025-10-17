@@ -1,6 +1,6 @@
 #include "../include/Engine.hpp"
 #include "../include/Logger.hpp"
-// #include "../include/Shader.hpp"
+#include "../include/Shader.hpp"
 #include "../include/Utils.hpp"
 
 #include <GLFW/glfw3.h>
@@ -188,7 +188,7 @@ void Engine::run() {
   }
 
   // INFO: --> Shader test starts here
-  // Shader shader;
+  Shader shader("../shaders/main.vert.glsl", "../shaders/main.frag.glsl");
   std::string vShaderSource = Utils::loadFile("../shaders/main.vert.glsl");
   const char* vShaderSrc = vShaderSource.c_str();
 
