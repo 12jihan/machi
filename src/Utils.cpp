@@ -1,8 +1,10 @@
 #include "../include/Utils.hpp"
 #include "../include/Logger.hpp"
 
+#include <stdlib.h>
 #include <fstream>
 #include <stdexcept>
+#include <iostream>
 #include <sstream>
 
 namespace Utils {
@@ -25,6 +27,13 @@ std::string loadFile(const std::string& filepath, bool debug) {
     LOG_INFO_F("Done Reading File: {}", filepath);
 
   return buffer.str();
+}
+
+void loadFile() {
+  // Load image, create texture and generate mipmaps
+  int width, height, nrChannels;
+
+  unsigned char* data = stbi_load(FileSystem::getPath());
 }
 
 }  // namespace Utils

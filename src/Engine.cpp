@@ -189,52 +189,6 @@ void Engine::run() {
 
   // INFO: --> Shader test starts here
   Shader shader("../shaders/main.vert.glsl", "../shaders/main.frag.glsl");
-  // std::string vShaderSource = Utils::loadFile("../shaders/main.vert.glsl");
-  // const char* vShaderSrc = vShaderSource.c_str();
-  //
-  // std::string fShaderSource = Utils::loadFile("../shaders/main.frag.glsl");
-  // const char* fShaderSrc = fShaderSource.c_str();
-
-  // int success;
-  // char infoLog[512];
-
-  // // vshader
-  // unsigned vShader;
-  // vShader = glCreateShader(GL_VERTEX_SHADER);
-  // glShaderSource(vShader, 1, &vShaderSrc, nullptr);
-  // glCompileShader(vShader);
-  // glGetShaderiv(vShader, GL_COMPILE_STATUS, &success);
-  // if (!success) {
-  //   glGetShaderInfoLog(vShader, 512, nullptr, infoLog);
-  //   LOG_ERROR_F("[Engine]::[Shader] there was an error with the vShader: {}", infoLog);
-  // };
-  //
-  // // fshader
-  // unsigned fShader;
-  // fShader = glCreateShader(GL_FRAGMENT_SHADER);
-  // glShaderSource(fShader, 1, &fShaderSrc, nullptr);
-  // glCompileShader(fShader);
-  // glGetShaderiv(fShader, GL_COMPILE_STATUS, &success);
-  // if (!success) {
-  //   glGetShaderInfoLog(fShader, 512, nullptr, infoLog);
-  //   LOG_ERROR_F("[Engine]::[Shader] there was an error with the fShader: {}", infoLog);
-  // };
-  //
-  // // Shader program
-  // unsigned int shaderProgram;
-  // shaderProgram = glCreateProgram();
-  // glAttachShader(shaderProgram, vShader);
-  // glAttachShader(shaderProgram, fShader);
-  // glLinkProgram(shaderProgram);
-  // glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-  // if (!success) {
-  //   glGetProgramInfoLog(shaderProgram, 512, nullptr, infoLog);
-  //   LOG_ERROR_F("[Engine]::[Shader] there was an error with the shader program: {}", infoLog);
-  // }
-  //
-  // // Delete the shaders
-  // glDeleteShader(vShader);
-  // glDeleteShader(fShader);
 
   // VAOs, VBOs, EBOs
   // clang-format off
@@ -245,29 +199,54 @@ void Engine::run() {
   // };
    
     float vertices[] = {
-    // positions         // colors
-     0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   // bottom right
-    -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   // bottom left
-     0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f    // top
+    0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,  
+    0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,
+  -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,
+  -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f 
     };
 
+    unsigned int indices[] = {  
+    0, 1, 3,
+    1, 2, 3
+    };
   // clang-format on
-  unsigned int vao, vbo;
+  unsigned int vao, vbo, ebo;
   glGenVertexArrays(1, &vao);
   glGenBuffers(1, &vbo);
+  glGenBuffers(1, &ebo);
 
   glBindVertexArray(vao);
 
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
+  glBindBuffer(GL_ARRAY_BUFFER, ebo);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), indices, GL_STATIC_DRAW);
+
   // position attribute
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), nullptr);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), nullptr);
   glEnableVertexAttribArray(0);
 
   // color attribute
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), reinterpret_cast<void*>(3 * sizeof(float)));
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void*>(3 * sizeof(float)));
   glEnableVertexAttribArray(1);
+
+  // texture attribute
+  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void*>(6 * sizeof(float)));
+  glEnableVertexAttribArray(2);
+
+  // Load and create texture
+  unsigned texture;
+  glGenBuffers(1, &texture);
+  glBindTexture(GL_TEXTURE_2D, texture);
+
+  // Set the texture parameters
+  glad_glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glad_glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+  // Set the texture parameters
+  glad_glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+  glad_glTextureParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
   // INFO: --> Shader test ends here
 
@@ -300,8 +279,8 @@ void Engine::run() {
 
     // Only update and render if we're not paused
     // if (!m_isPaused) {
-    // glUseProgram(shaderProgram);
     shader.use();
+    glBindTexture(GL_TEXTURE_2D, texture);
     glBindVertexArray(vao);
     glDrawArrays(GL_TRIANGLES, 0, 3);
     glBindVertexArray(0);
