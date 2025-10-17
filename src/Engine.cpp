@@ -189,52 +189,52 @@ void Engine::run() {
 
   // INFO: --> Shader test starts here
   Shader shader("../shaders/main.vert.glsl", "../shaders/main.frag.glsl");
-  std::string vShaderSource = Utils::loadFile("../shaders/main.vert.glsl");
-  const char* vShaderSrc = vShaderSource.c_str();
+  // std::string vShaderSource = Utils::loadFile("../shaders/main.vert.glsl");
+  // const char* vShaderSrc = vShaderSource.c_str();
+  //
+  // std::string fShaderSource = Utils::loadFile("../shaders/main.frag.glsl");
+  // const char* fShaderSrc = fShaderSource.c_str();
 
-  std::string fShaderSource = Utils::loadFile("../shaders/main.frag.glsl");
-  const char* fShaderSrc = fShaderSource.c_str();
+  // int success;
+  // char infoLog[512];
 
-  int success;
-  char infoLog[512];
-
-  // vshader
-  unsigned vShader;
-  vShader = glCreateShader(GL_VERTEX_SHADER);
-  glShaderSource(vShader, 1, &vShaderSrc, nullptr);
-  glCompileShader(vShader);
-  glGetShaderiv(vShader, GL_COMPILE_STATUS, &success);
-  if (!success) {
-    glGetShaderInfoLog(vShader, 512, nullptr, infoLog);
-    LOG_ERROR_F("[Engine]::[Shader] there was an error with the vShader: {}", infoLog);
-  };
-
-  // fshader
-  unsigned fShader;
-  fShader = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(fShader, 1, &fShaderSrc, nullptr);
-  glCompileShader(fShader);
-  glGetShaderiv(fShader, GL_COMPILE_STATUS, &success);
-  if (!success) {
-    glGetShaderInfoLog(fShader, 512, nullptr, infoLog);
-    LOG_ERROR_F("[Engine]::[Shader] there was an error with the fShader: {}", infoLog);
-  };
-
-  // Shader program
-  unsigned int shaderProgram;
-  shaderProgram = glCreateProgram();
-  glAttachShader(shaderProgram, vShader);
-  glAttachShader(shaderProgram, fShader);
-  glLinkProgram(shaderProgram);
-  glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-  if (!success) {
-    glGetProgramInfoLog(shaderProgram, 512, nullptr, infoLog);
-    LOG_ERROR_F("[Engine]::[Shader] there was an error with the shader program: {}", infoLog);
-  }
-
-  // Delete the shaders
-  glDeleteShader(vShader);
-  glDeleteShader(fShader);
+  // // vshader
+  // unsigned vShader;
+  // vShader = glCreateShader(GL_VERTEX_SHADER);
+  // glShaderSource(vShader, 1, &vShaderSrc, nullptr);
+  // glCompileShader(vShader);
+  // glGetShaderiv(vShader, GL_COMPILE_STATUS, &success);
+  // if (!success) {
+  //   glGetShaderInfoLog(vShader, 512, nullptr, infoLog);
+  //   LOG_ERROR_F("[Engine]::[Shader] there was an error with the vShader: {}", infoLog);
+  // };
+  //
+  // // fshader
+  // unsigned fShader;
+  // fShader = glCreateShader(GL_FRAGMENT_SHADER);
+  // glShaderSource(fShader, 1, &fShaderSrc, nullptr);
+  // glCompileShader(fShader);
+  // glGetShaderiv(fShader, GL_COMPILE_STATUS, &success);
+  // if (!success) {
+  //   glGetShaderInfoLog(fShader, 512, nullptr, infoLog);
+  //   LOG_ERROR_F("[Engine]::[Shader] there was an error with the fShader: {}", infoLog);
+  // };
+  //
+  // // Shader program
+  // unsigned int shaderProgram;
+  // shaderProgram = glCreateProgram();
+  // glAttachShader(shaderProgram, vShader);
+  // glAttachShader(shaderProgram, fShader);
+  // glLinkProgram(shaderProgram);
+  // glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+  // if (!success) {
+  //   glGetProgramInfoLog(shaderProgram, 512, nullptr, infoLog);
+  //   LOG_ERROR_F("[Engine]::[Shader] there was an error with the shader program: {}", infoLog);
+  // }
+  //
+  // // Delete the shaders
+  // glDeleteShader(vShader);
+  // glDeleteShader(fShader);
 
   // VAOs, VBOs, EBOs
   // clang-format off
@@ -300,7 +300,8 @@ void Engine::run() {
 
     // Only update and render if we're not paused
     // if (!m_isPaused) {
-    glUseProgram(shaderProgram);
+    // glUseProgram(shaderProgram);
+    shader.use();
     glBindVertexArray(vao);
     glDrawArrays(GL_TRIANGLES, 0, 3);
     glBindVertexArray(0);
