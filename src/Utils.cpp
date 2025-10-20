@@ -1,7 +1,10 @@
 #include "../include/Utils.hpp"
 #include "../include/Logger.hpp"
 
-#include <stdlib.h>
+// #include "../include/stb_image.h"
+#include "../include/stb_image.h"
+#include <string>
+#include <filesystem>
 #include <fstream>
 #include <stdexcept>
 #include <iostream>
@@ -29,11 +32,12 @@ std::string loadFile(const std::string& filepath, bool debug) {
   return buffer.str();
 }
 
-void loadFile() {
+void loadImage() {
   // Load image, create texture and generate mipmaps
   int width, height, nrChannels;
 
-  unsigned char* data = stbi_load(FileSystem::getPath());
+  unsigned char* data = stbi_load(
+    FileSystem::getPath("../textures/wood_texture/wood_texture.png").c_str(), &width, &height, &nrChannels, 0);
 }
 
 }  // namespace Utils
