@@ -29,7 +29,7 @@ std::string loadFile(const std::string& filepath, bool debug) {
   return buffer.str();
 }
 
-void loadFile() {
+void loadImage() {
   // Load image, create texture and generate mipmaps
   int width, height, nrChannels;
 
