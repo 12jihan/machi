@@ -1,7 +1,7 @@
 #include "../include/Utils.hpp"
 #include "../include/Logger.hpp"
+#include "../include/stb_image.h"
 
-#include <stdlib.h>
 #include <fstream>
 #include <stdexcept>
 #include <iostream>
@@ -33,7 +33,8 @@ void loadFile() {
   // Load image, create texture and generate mipmaps
   int width, height, nrChannels;
 
-  unsigned char* data = stbi_load(FileSystem::getPath());
+  unsigned char* data = stbi_load("../textures/wood_texture/wood_texture.png", &width, &height, &nrChannels, 0);
+  LOG_INFO_F("height: {}, width: {}", height, width);
 }
 
 }  // namespace Utils

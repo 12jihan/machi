@@ -15,10 +15,10 @@ find_package(glfw3 REQUIRED)
 find_package(glm REQUIRED)
 
 # Include directories
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/glad/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/glad/include)
 
 # Adding Glad src files (assuming they're in lib folder)
-file(GLOB GLAD_SRC "${CMAKE_CURRENT_SOURCE_DIR}/lib/glad/src/*.c")
+file(GLOB GLAD_SRC "${CMAKE_CURRENT_SOURCE_DIR}/external/glad/src/*.c")
 
 # App sources -- explicitly list them out // I'm not for now because i'm lazy
 set(APP_SRC
