@@ -1,6 +1,7 @@
+
 #include "../include/Utils.hpp"
-#include "../include/Logger.hpp"
 #include "stb_image.h"
+#include "../include/Logger.hpp"
 
 #include <fstream>
 #include <stdexcept>
@@ -29,12 +30,38 @@ std::string loadFile(const std::string& filepath, bool debug) {
   return buffer.str();
 }
 
-void loadImage() {
+unsigned char* loadImage(const std::string& filepath, bool debug) {
   // Load image, create texture and generate mipmaps
-  int width, height, nrChannels;
+  const char* _file = filepath.c_str();
+  int _width, _height, _numChannels;
 
-  unsigned char* data = stbi_load("../textures/wood_texture/wood_texture.png", &width, &height, &nrChannels, 0);
-  LOG_INFO_F("height: {}, width: {}", height, width);
+  unsigned char* data = stbi_load(filepath.c_str(), &_width, &_height, &_numChannels, 0);
+  LOG_INFO_F("Loading image data: \n> {}", _file);
+  if (data) {
+    LOG_INFO_F("height: {}, width: {}", _height, _width);
+    LOG_INFO_F("Number of Channels: {}", _numChannels);
+  } else {
+    LOG_ERROR("Unable to load Image");
+  }
+
+  return data;
+}
+
+Image loadImageTest(const std::string& filepath, bool debug) {
+  // Image obj
+  Image img;
+
+  img.data = stbi_load(filepath.c_str(), &img.width, &img.height, &img.channels, 0);
+  LOG_INFO_F("Loading image data: \n> {}", filepath);
+
+  if (img.data) {
+    LOG_INFO_F("height: {}, width: {}", img.height, img.width);
+    LOG_INFO_F("Number of Channels: {}", img.channels);
+  } else {
+    LOG_ERROR("Unable to load Image");
+  }
+
+  return img;
 }
 
 }  // namespace Utils
