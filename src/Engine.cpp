@@ -221,8 +221,8 @@ void Engine::run() {
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-  glBindBuffer(GL_ARRAY_BUFFER, ebo);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), indices, GL_STATIC_DRAW);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
   // position attribute
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), nullptr);
@@ -289,12 +289,19 @@ void Engine::run() {
     // Process all pending window events (keyboard, mouse, window operations)
     processEvents();
 
-    // Only update and render if we're not paused
-    // if (!m_isPaused) {
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    // TODO: Check this when you get a chance this was the most recent thing that you took a lookg at before you landed
+    // in AZ...
+
+    //  if (!m_isPaused) {
     shader.use();
+    shader.setInt("tex0", 0);
+
     glBindTexture(GL_TEXTURE_2D, texture);
     glBindVertexArray(vao);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
     // Update all game systems with the calculated delta time
     // updateSystems(m_deltaTime);
