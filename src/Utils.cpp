@@ -1,6 +1,6 @@
 #include "../include/Utils.hpp"
 #include "../include/Logger.hpp"
-#include "../include/stb_image.h"
+#include "stb_image.h"
 
 #include <fstream>
 #include <stdexcept>
