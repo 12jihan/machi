@@ -30,29 +30,29 @@ std::string loadFile(const std::string& filepath, bool debug) {
   return buffer.str();
 }
 
-unsigned char* loadImage(const std::string& filepath, bool debug) {
-  // Load image, create texture and generate mipmaps
-  const char* _file = filepath.c_str();
-  int _width, _height, _numChannels;
+// unsigned char* loadImage(const std::string& filepath, bool debug) {
+//   // Load image, create texture and generate mipmaps
+//   const char* _file = filepath.c_str();
+//   int _width, _height, _numChannels;
+//
+//   unsigned char* data = stbi_load(filepath.c_str(), &_width, &_height, &_numChannels, 0);
+//   LOG_INFO_F("Loading image data: \n> {}", _file);
+//   if (data) {
+//     LOG_INFO_F("height: {}, width: {}", _height, _width);
+//     LOG_INFO_F("Number of Channels: {}", _numChannels);
+//   } else {
+//     LOG_ERROR("Unable to load Image");
+//   }
+//
+//   return data;
+// }
 
-  unsigned char* data = stbi_load(filepath.c_str(), &_width, &_height, &_numChannels, 0);
-  LOG_INFO_F("Loading image data: \n> {}", _file);
-  if (data) {
-    LOG_INFO_F("height: {}, width: {}", _height, _width);
-    LOG_INFO_F("Number of Channels: {}", _numChannels);
-  } else {
-    LOG_ERROR("Unable to load Image");
-  }
-
-  return data;
-}
-
-Image loadImageTest(const std::string& filepath, bool debug) {
+Image loadImage(const std::string& filepath, bool debug) {
   // Image obj
   Image img;
 
   img.data = stbi_load(filepath.c_str(), &img.width, &img.height, &img.channels, 0);
-  LOG_INFO_F("Loading image data: \n> {}", filepath);
+  LOG_INFO_F("Loading image data: {}", filepath);
 
   if (img.data) {
     LOG_INFO_F("height: {}, width: {}", img.height, img.width);
@@ -62,6 +62,16 @@ Image loadImageTest(const std::string& filepath, bool debug) {
   }
 
   return img;
+}
+
+void freeImage(Image& img) {
+  if (img.data) {
+    stbi_image_free(img.data);
+    LOG_INFO("Image data freed");
+    return;
+  }
+
+  LOG_ERROR("You're attempting to free data that no longer exists...");
 }
 
 }  // namespace Utils

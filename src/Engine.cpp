@@ -238,7 +238,7 @@ void Engine::run() {
 
   // Load and create texture
   unsigned texture;
-  glGenBuffers(1, &texture);
+  glGenTextures(1, &texture);
   glBindTexture(GL_TEXTURE_2D, texture);
   // Set the texture parameters
   glad_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -247,7 +247,18 @@ void Engine::run() {
   glad_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
   glad_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-  auto data = Utils::loadImage("../textures/wood_texture/wood_texture.png");
+  Utils::Image texImg = Utils::loadImage("../textures/wood_texture/wood_texture.png");
+  if (texImg.data) {
+    LOG_INFO("TEXTURE IMAGE DATA Loading SUCCESS...");
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texImg.width, texImg.height, 0, GL_RGB, GL_UNSIGNED_BYTE, texImg.data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+  } else {
+    LOG_INFO("Possible error with TEXTURE IMAGE DATA ...");
+  }
+  Utils::freeImage(texImg);
+
+  shader.use();
+  shader.setInt("tex0", 0);
 
   // INFO: --> Shader test ends here
 

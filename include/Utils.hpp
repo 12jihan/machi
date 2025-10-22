@@ -5,15 +5,17 @@ namespace Utils {
 struct Image {
   unsigned char* data = nullptr;
 
-  unsigned int width;
-  unsigned int height;
-  unsigned int channels;
+  int width;
+  int height;
+  int channels;
 };
 
 std::string loadFile(const std::string& filepath, bool debug = true);
 
-Image loadImageTest(const std::string& filepath, bool debug = true);
+// unsigned char* loadImage(const std::string& filepath, bool debug = true);
 
-void freeImag(Image& img);
+Image loadImage(const std::string& filepath, bool debug = true);
+
+void freeImage(Image& img);
 
 }  // namespace Utils
