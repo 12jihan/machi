@@ -216,11 +216,14 @@ void Engine::run() {
   glGenBuffers(1, &vbo);
   glGenBuffers(1, &ebo);
 
+  // vao
   glBindVertexArray(vao);
 
+  // vbo
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
+  // ebo
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
   glBufferData(GL_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
@@ -237,7 +240,7 @@ void Engine::run() {
   glEnableVertexAttribArray(2);
 
   // Load and create texture
-  unsigned texture;
+  unsigned int texture;
   glGenTextures(1, &texture);
   glBindTexture(GL_TEXTURE_2D, texture);
   // Set the texture parameters
