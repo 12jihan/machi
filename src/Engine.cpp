@@ -225,7 +225,7 @@ void Engine::run() {
 
   // ebo
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
   // position attribute
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), nullptr);
@@ -240,28 +240,50 @@ void Engine::run() {
   glEnableVertexAttribArray(2);
 
   // Load and create texture
-  unsigned int texture;
-  glGenTextures(1, &texture);
-  glBindTexture(GL_TEXTURE_2D, texture);
+  unsigned int texture0, texture1;
+  //---- texture0
+  glGenTextures(1, &texture0);
+  glBindTexture(GL_TEXTURE_2D, texture0);
   // Set the texture parameters
   glad_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glad_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
   // Set the texture parameters
   glad_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
   glad_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-  Utils::Image texImg = Utils::loadImage("../textures/wood_texture/wood_texture.png");
-  if (texImg.data) {
+  Utils::Image texImgWood = Utils::loadImage("../resources/textures/wood_texture/wood_texture.png");
+  if (texImgWood.data) {
     LOG_INFO("TEXTURE IMAGE DATA Loading SUCCESS...");
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texImg.width, texImg.height, 0, GL_RGB, GL_UNSIGNED_BYTE, texImg.data);
+    glTexImage2D(
+      GL_TEXTURE_2D, 0, GL_RGB, texImgWood.width, texImgWood.height, 0, GL_RGB, GL_UNSIGNED_BYTE, texImgWood.data);
     glGenerateMipmap(GL_TEXTURE_2D);
   } else {
     LOG_INFO("Possible error with TEXTURE IMAGE DATA ...");
   }
-  Utils::freeImage(texImg);
+  Utils::freeImage(texImgWood);
+
+  //---- texture1
+  glGenTextures(1, &texture1);
+  glBindTexture(GL_TEXTURE_2D, texture1);
+  // Set the texture parameters
+  glad_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glad_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  // Set the texture parameters
+  glad_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glad_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  Utils::Image texImgOak = Utils::loadImage("../resources/textures/wood_oak_texture/wood_oak_texture.png");
+  if (texImgOak.data) {
+    LOG_INFO("TEXTURE IMAGE DATA Loading SUCCESS...");
+    glTexImage2D(
+      GL_TEXTURE_2D, 0, GL_RGB, texImgOak.width, texImgOak.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texImgOak.data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+  } else {
+    LOG_INFO("Possible error with TEXTURE IMAGE DATA ...");
+  }
+  Utils::freeImage(texImgOak);
 
   shader.use();
-  shader.setInt("tex0", 0);
+  shader.setInt("texture0", 0);
+  shader.setInt("texture1", 1);
 
   // INFO: --> Shader test ends here
 
@@ -271,16 +293,18 @@ void Engine::run() {
 
   // Main engine, loop - this is the heart of your game engine
   LOG_INFO_F("[Engine]::[Shader] m_isPaused {}", m_isPaused);
-  if (false) {
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-  }
+  // if (false) {
+  //   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  // }
 
   // Check how many attributes are available
-  int nrAttributes;
-  glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
-  LOG_INFO_F("[Engine]::[Shader] Max vertex attributes supported: {}", nrAttributes);
+  // int nrAttributes;
+  // glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
+  // LOG_INFO_F("[Engine]::[Shader] Max vertex attributes supported: {}", nrAttributes);
 
+  glClearColor(0.2, 0.0, 0.0, 1.0);
   while (m_isRunning && !m_windowManager->shouldClose()) {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     // Caculate time since last frame for smooth, frame-rate independent updates
     auto currentTime = std::chrono::high_resolution_clock::now();
     m_deltaTime = std::chrono::duration<float>(currentTime - m_lastFrameTime).count();
@@ -292,20 +316,21 @@ void Engine::run() {
     // Process all pending window events (keyboard, mouse, window operations)
     processEvents();
 
+    // bind Texture
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture);
+    glBindTexture(GL_TEXTURE_2D, texture0);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, texture1);
+
+    // render container
+    shader.use();
+    glBindVertexArray(vao);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
     // TODO: Check this when you get a chance this was the most recent thing that you took a lookg at before you landed
     // in AZ...
 
     //  if (!m_isPaused) {
-    shader.use();
-    shader.setInt("tex0", 0);
-
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glBindVertexArray(vao);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
     // Update all game systems with the calculated delta time
     // updateSystems(m_deltaTime);
 
