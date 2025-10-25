@@ -189,27 +189,22 @@ void Engine::run() {
   }
 
   // INFO: --> Shader test starts here
-  Shader shader("../shaders/main.vert.glsl", "../shaders/main.frag.glsl");
+  Shader shader("../resources/shaders/main.vert.glsl", "../resources/shaders/main.frag.glsl");
 
   // VAOs, VBOs, EBOs
+
   // clang-format off
-  // float vertices[] = {
-  //   -0.5f, -0.5f, 0.0f,
-  //   0.5f, -0.5f, 0.0f,
-  //   0.0f, 0.5f, 0.0f
-  // };
-   
-    float vertices[] = {
+  float vertices[] = {
     0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,  
     0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,
   -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,
   -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f 
-    };
+  };
 
-    unsigned int indices[] = {  
-    0, 1, 3,
-    1, 2, 3
-    };
+  unsigned int indices[] = {  
+  0, 1, 3,
+  1, 2, 3
+  };
   // clang-format on
   unsigned int vao, vbo, ebo;
   glGenVertexArrays(1, &vao);
@@ -241,6 +236,7 @@ void Engine::run() {
 
   // Load and create texture
   unsigned int texture0, texture1;
+
   //---- texture0
   glGenTextures(1, &texture0);
   glBindTexture(GL_TEXTURE_2D, texture0);
@@ -270,11 +266,11 @@ void Engine::run() {
   // Set the texture parameters
   glad_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glad_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  Utils::Image texImgOak = Utils::loadImage("../resources/textures/wood_oak_texture/wood_oak_texture.png");
+  Utils::Image texImgOak = Utils::loadImage("../resources/textures/wood_oak_texture/wood_oak_texture.jpg");
   if (texImgOak.data) {
     LOG_INFO("TEXTURE IMAGE DATA Loading SUCCESS...");
     glTexImage2D(
-      GL_TEXTURE_2D, 0, GL_RGB, texImgOak.width, texImgOak.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texImgOak.data);
+      GL_TEXTURE_2D, 0, GL_RGB, texImgOak.width, texImgOak.height, 0, GL_RGB, GL_UNSIGNED_BYTE, texImgOak.data);
     glGenerateMipmap(GL_TEXTURE_2D);
   } else {
     LOG_INFO("Possible error with TEXTURE IMAGE DATA ...");
