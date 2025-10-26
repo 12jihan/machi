@@ -313,14 +313,22 @@ void Engine::run() {
     // Process all pending window events (keyboard, mouse, window operations)
     processEvents();
 
+    // LOG_INFO_F("trans: {}", trans.length());
+
     // bind Texture
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture0);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, texture1);
 
+    // glm stuff
+    glm::mat4 trans = glm::mat4(1.0f);
+    trans = glm::translate(trans, glm::vec3(0.5, -0.5, 0.0));
+    trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0, 0.0, 1.0));
+
     // render container
     shader.use();
+    shader.setMatrix("transform", trans);
     glBindVertexArray(vao);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
