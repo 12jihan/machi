@@ -50,6 +50,7 @@ std::string loadFile(const std::string& filepath, bool debug) {
 Image loadImage(const std::string& filepath, bool debug) {
   // Image obj
   Image img;
+  stbi_set_flip_vertically_on_load(true);
 
   img.data = stbi_load(filepath.c_str(), &img.width, &img.height, &img.channels, 0);
   LOG_INFO_F("Loading image data: {}", filepath);
