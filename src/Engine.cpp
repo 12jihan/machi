@@ -266,11 +266,12 @@ void Engine::run() {
   // Set the texture parameters
   glad_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glad_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  Utils::Image texImgOak = Utils::loadImage("../resources/textures/wood_oak_texture/wood_oak_texture.jpg");
+  Utils::Image texImgOak = Utils::loadImage("../resources/textures/awesomeface.png");
+  // Utils::Image texImgOak = Utils::loadImage("../resources/textures/wood_oak_texture/wood_oak_texture.jpg");
   if (texImgOak.data) {
     LOG_INFO("TEXTURE IMAGE DATA Loading SUCCESS...");
     glTexImage2D(
-      GL_TEXTURE_2D, 0, GL_RGB, texImgOak.width, texImgOak.height, 0, GL_RGB, GL_UNSIGNED_BYTE, texImgOak.data);
+      GL_TEXTURE_2D, 0, GL_RGB, texImgOak.width, texImgOak.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texImgOak.data);
     glGenerateMipmap(GL_TEXTURE_2D);
   } else {
     LOG_INFO("Possible error with TEXTURE IMAGE DATA ...");
