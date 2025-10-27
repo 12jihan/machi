@@ -37,6 +37,7 @@ set(APP_SRC
   src/Logger.cpp
   src/InputManager.cpp
   src/Utils.cpp
+  src/Texture.cpp
 )
 
 # Create your executable

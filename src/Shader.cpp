@@ -23,7 +23,7 @@ Shader::Shader(const char* vPath, const char* fPath) {
     LOG_ERROR_F("[Shader] there was an error with the vShader: {}", infoLog);
   };
 
-  // Vertex Shader
+  // Frag Shader
   fShader = glCreateShader(GL_FRAGMENT_SHADER);
   glShaderSource(fShader, 1, &fShaderCode, nullptr);
   glCompileShader(fShader);

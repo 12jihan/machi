@@ -2,6 +2,7 @@
 #include "../include/Logger.hpp"
 #include "../include/Shader.hpp"
 #include "../include/Utils.hpp"
+#include "../include/Texture.hpp"
 
 #include <GLFW/glfw3.h>
 
@@ -235,7 +236,7 @@ void Engine::run() {
   glEnableVertexAttribArray(2);
 
   // Load and create texture
-  unsigned int texture0, texture1;
+  unsigned int texture0;
 
   //---- texture0
   glGenTextures(1, &texture0);
@@ -258,25 +259,26 @@ void Engine::run() {
   Utils::freeImage(texImgWood);
 
   //---- texture1
-  glGenTextures(1, &texture1);
-  glBindTexture(GL_TEXTURE_2D, texture1);
-  // Set the texture parameters
-  glad_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glad_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  // Set the texture parameters
-  glad_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glad_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  Utils::Image texImgOak = Utils::loadImage("../resources/textures/awesomeface.png");
-  // Utils::Image texImgOak = Utils::loadImage("../resources/textures/wood_oak_texture/wood_oak_texture.jpg");
-  if (texImgOak.data) {
-    LOG_INFO("TEXTURE IMAGE DATA Loading SUCCESS...");
-    glTexImage2D(
-      GL_TEXTURE_2D, 0, GL_RGB, texImgOak.width, texImgOak.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texImgOak.data);
-    glGenerateMipmap(GL_TEXTURE_2D);
-  } else {
-    LOG_INFO("Possible error with TEXTURE IMAGE DATA ...");
-  }
-  Utils::freeImage(texImgOak);
+  Texture texture1(1, "../resources/textures/awesomeface.png");
+  // glGenTextures(1, &texture1);
+  // glBindTexture(GL_TEXTURE_2D, texture1);
+  // // Set the texture parameters
+  // glad_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  // glad_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  // // Set the texture parameters
+  // glad_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  // glad_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  // Utils::Image texImgOak = Utils::loadImage("../resources/textures/awesomeface.png");
+  // // Utils::Image texImgOak = Utils::loadImage("../resources/textures/wood_oak_texture/wood_oak_texture.jpg");
+  // if (texImgOak.data) {
+  //   LOG_INFO("TEXTURE IMAGE DATA Loading SUCCESS...");
+  //   glTexImage2D(
+  //     GL_TEXTURE_2D, 0, GL_RGB, texImgOak.width, texImgOak.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texImgOak.data);
+  //   glGenerateMipmap(GL_TEXTURE_2D);
+  // } else {
+  //   LOG_INFO("Possible error with TEXTURE IMAGE DATA ...");
+  // }
+  // Utils::freeImage(texImgOak);
 
   shader.use();
   shader.setInt("texture0", 0);
@@ -318,8 +320,9 @@ void Engine::run() {
     // bind Texture
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture0);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, texture1);
+    texture1.bindTexture();
+    // glActiveTexture(GL_TEXTURE1);
+    // glBindTexture(GL_TEXTURE_2D, texture1);
 
     // glm stuff
     glm::mat4 trans = glm::mat4(1.0f);
