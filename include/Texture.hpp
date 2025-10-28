@@ -3,12 +3,6 @@
 #include <glad/glad.h>
 #include "../include/Utils.hpp"
 
-enum test {
-  "PNG",
-  "JPEG",
-  "JPG"
-}
-
 class Texture {
 private:
   unsigned m_texture;
@@ -19,6 +13,10 @@ private:
   void loadTexture(const char* filepath);
 
 public:
+  // enum class Format { PNG, JPEG, JPG };
+  // enum class Filter { PNG, JPEG, JPG };
+  // enum class Wrap { PNG, JPEG, JPG };
+
   Texture(int texture_slot, const char* filepath);
   void bindTexture();
   unsigned const getTexture() const;

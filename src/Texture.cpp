@@ -15,6 +15,21 @@ void Texture::loadTexture(const char* filepath) {
 
   if (m_texture_img.data) {
     LOG_INFO("TEXTURE IMAGE DATA LOADING SUCCESS...");
+
+    const int channels = m_texture_img.channels;
+    LOG_INFO_F("Image has {} Channels", channels);
+
+    switch (channels) {
+      case 1:
+        break;
+      case 2:
+        break;
+      case 3:
+        break;
+      case 4:
+        break;
+    };
+
     glTexImage2D(GL_TEXTURE_2D,
                  0,
                  GL_RGB,
