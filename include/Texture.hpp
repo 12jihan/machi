@@ -9,7 +9,7 @@ private:
   int m_texture_num = 0;
   Utils::Image m_texture_img;
 
-  void setParams();
+  void setParams() const;
   void loadTexture(const char* filepath);
 
 public:

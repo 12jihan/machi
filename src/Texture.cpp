@@ -1,7 +1,7 @@
 #include "../include/Texture.hpp"
 #include "../include/Logger.hpp"
 
-void Texture::setParams() {
+void Texture::setParams() const {
   // Set the texture parameters
   glad_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glad_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -61,14 +61,13 @@ Texture::Texture(int texture_slot, const char* filepath) : m_texture_num(texture
 
   setParams();
   loadTexture(filepath);
-};
+}
 
 void Texture::bindTexture() {
   glActiveTexture(GL_TEXTURE0 + m_texture_num);
-  LOG_INFO_F("default: {}, After: {}", GL_TEXTURE0, GL_TEXTURE0 + m_texture_num);
   glBindTexture(GL_TEXTURE_2D, m_texture);
 }
 
 unsigned const Texture::getTexture() const {
   return m_texture;
-};
+}

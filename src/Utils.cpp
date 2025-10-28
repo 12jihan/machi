@@ -1,4 +1,3 @@
-
 #include "../include/Utils.hpp"
 #include "stb_image.h"
 #include "../include/Logger.hpp"
@@ -29,23 +28,6 @@ std::string loadFile(const std::string& filepath, bool debug) {
 
   return buffer.str();
 }
-
-// unsigned char* loadImage(const std::string& filepath, bool debug) {
-//   // Load image, create texture and generate mipmaps
-//   const char* _file = filepath.c_str();
-//   int _width, _height, _numChannels;
-//
-//   unsigned char* data = stbi_load(filepath.c_str(), &_width, &_height, &_numChannels, 0);
-//   LOG_INFO_F("Loading image data: \n> {}", _file);
-//   if (data) {
-//     LOG_INFO_F("height: {}, width: {}", _height, _width);
-//     LOG_INFO_F("Number of Channels: {}", _numChannels);
-//   } else {
-//     LOG_ERROR("Unable to load Image");
-//   }
-//
-//   return data;
-// }
 
 Image loadImage(const std::string& filepath, bool debug) {
   // Image obj

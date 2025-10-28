@@ -1,7 +1,7 @@
 #include "../include/Engine.hpp"
 #include "../include/Logger.hpp"
 #include "../include/Shader.hpp"
-#include "../include/Utils.hpp"
+// #include "../include/Utils.hpp"
 #include "../include/Texture.hpp"
 
 #include <GLFW/glfw3.h>
@@ -207,6 +207,7 @@ void Engine::run() {
   1, 2, 3
   };
   // clang-format on
+
   unsigned int vao, vbo, ebo;
   glGenVertexArrays(1, &vao);
   glGenBuffers(1, &vbo);
@@ -236,56 +237,15 @@ void Engine::run() {
   glEnableVertexAttribArray(2);
 
   // Load and create texture
-  unsigned int texture0;
-
-  //---- texture0
-  glGenTextures(1, &texture0);
-  glBindTexture(GL_TEXTURE_2D, texture0);
-  // Set the texture parameters
-  glad_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glad_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  // Set the texture parameters
-  glad_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-  glad_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  Utils::Image texImgWood = Utils::loadImage("../resources/textures/wood_texture/wood_texture.png");
-  if (texImgWood.data) {
-    LOG_INFO("TEXTURE IMAGE DATA Loading SUCCESS...");
-    glTexImage2D(
-      GL_TEXTURE_2D, 0, GL_RGB, texImgWood.width, texImgWood.height, 0, GL_RGB, GL_UNSIGNED_BYTE, texImgWood.data);
-    glGenerateMipmap(GL_TEXTURE_2D);
-  } else {
-    LOG_INFO("Possible error with TEXTURE IMAGE DATA ...");
-  }
-  Utils::freeImage(texImgWood);
-
-  //---- texture1
+  Texture texture0(0, "../resources/textures/wood_texture/wood_texture.png");
   Texture texture1(1, "../resources/textures/awesomeface.png");
-  // glGenTextures(1, &texture1);
-  // glBindTexture(GL_TEXTURE_2D, texture1);
-  // // Set the texture parameters
-  // glad_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  // glad_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  // // Set the texture parameters
-  // glad_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  // glad_glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  // Utils::Image texImgOak = Utils::loadImage("../resources/textures/awesomeface.png");
-  // // Utils::Image texImgOak = Utils::loadImage("../resources/textures/wood_oak_texture/wood_oak_texture.jpg");
-  // if (texImgOak.data) {
-  //   LOG_INFO("TEXTURE IMAGE DATA Loading SUCCESS...");
-  //   glTexImage2D(
-  //     GL_TEXTURE_2D, 0, GL_RGB, texImgOak.width, texImgOak.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texImgOak.data);
-  //   glGenerateMipmap(GL_TEXTURE_2D);
-  // } else {
-  //   LOG_INFO("Possible error with TEXTURE IMAGE DATA ...");
-  // }
-  // Utils::freeImage(texImgOak);
 
+  // Use Shader
   shader.use();
   shader.setInt("texture0", 0);
   shader.setInt("texture1", 1);
 
   // INFO: --> Shader test ends here
-
   LOG_INFO("[ENGINE] starting main engine loop...");
   m_isRunning = true;
   m_lastFrameTime = std::chrono::high_resolution_clock::now();
@@ -318,11 +278,8 @@ void Engine::run() {
     // LOG_INFO_F("trans: {}", trans.length());
 
     // bind Texture
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture0);
+    texture0.bindTexture();
     texture1.bindTexture();
-    // glActiveTexture(GL_TEXTURE1);
-    // glBindTexture(GL_TEXTURE_2D, texture1);
 
     // glm stuff
     glm::mat4 trans = glm::mat4(1.0f);
