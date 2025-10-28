@@ -7,6 +7,10 @@
 #include <GLFW/glfw3.h>
 
 #include <chrono>
+#include <glm/ext/matrix_clip_space.hpp>
+#include <glm/ext/matrix_transform.hpp>
+#include <glm/fwd.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <iomanip>
 #include <memory>
 #include <sstream>
@@ -196,10 +200,10 @@ void Engine::run() {
 
   // clang-format off
   float vertices[] = {
-    0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,  
-    0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,
-  -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,
-  -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f 
+    0.5f,  0.5f,   0.0f,      1.0f,   1.0f,  
+    0.5f, -0.5f,   0.0f,      1.0f,   0.0f,
+  -0.5f,-0.5f,  0.0f,     0.0f,  0.0f,
+  -0.5f, 0.5f,  0.0f,     0.0f,  1.0f 
   };
 
   unsigned int indices[] = {  
@@ -225,16 +229,12 @@ void Engine::run() {
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
   // position attribute
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), nullptr);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), nullptr);
   glEnableVertexAttribArray(0);
 
-  // color attribute
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void*>(3 * sizeof(float)));
-  glEnableVertexAttribArray(1);
-
   // texture attribute
-  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void*>(6 * sizeof(float)));
-  glEnableVertexAttribArray(2);
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), reinterpret_cast<void*>(3 * sizeof(float)));
+  glEnableVertexAttribArray(1);
 
   // Load and create texture
   Texture texture0(0, "../resources/textures/wood_texture/wood_texture.png");
@@ -261,8 +261,8 @@ void Engine::run() {
   // glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
   // LOG_INFO_F("[Engine]::[Shader] Max vertex attributes supported: {}", nrAttributes);
 
-  glClearColor(0.2, 0.0, 0.0, 1.0);
   while (m_isRunning && !m_windowManager->shouldClose()) {
+    glClearColor(0.2, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     // Caculate time since last frame for smooth, frame-rate independent updates
     auto currentTime = std::chrono::high_resolution_clock::now();
@@ -281,19 +281,20 @@ void Engine::run() {
     texture0.bindTexture();
     texture1.bindTexture();
 
-    // glm stuff
-    glm::mat4 trans = glm::mat4(1.0f);
-    trans = glm::translate(trans, glm::vec3(0.5, -0.5, 0.0));
-    trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0, 0.0, 1.0));
-
-    // render container
+    // Activate Shader & Create transformations
     shader.use();
-    shader.setMatrix("transform", trans);
+    glm::mat4 model, view, projection = glm::mat4(1.0f);
+    model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+    projection =
+      glm::perspective(glm::radians(45.0f), (float)m_config.windowWidth / (float)m_config.windowHeight, 0.1f, 100.0f);
+
+    shader.setMat4("model", model);
+    shader.setMat4("view", view);
+    shader.setMat4("projection", projection);
+
     glBindVertexArray(vao);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-    // TODO: Check this when you get a chance this was the most recent thing that you took a lookg at before you landed
-    // in AZ...
 
     //  if (!m_isPaused) {
     // Update all game systems with the calculated delta time
