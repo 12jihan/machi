@@ -261,8 +261,12 @@ void Engine::run() {
   // glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
   // LOG_INFO_F("[Engine]::[Shader] Max vertex attributes supported: {}", nrAttributes);
 
+  LOG_INFO_F("checking the window config frame: {} x {}", m_config.windowWidth, m_config.windowHeight);
   while (m_isRunning && !m_windowManager->shouldClose()) {
-    glClearColor(0.2, 0.0, 0.0, 1.0);
+    // Process all pending window events (keyboard, mouse, window operations)
+    processEvents();
+
+    glClearColor(0.1, 0.0, 0.5, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     // Caculate time since last frame for smooth, frame-rate independent updates
     auto currentTime = std::chrono::high_resolution_clock::now();
@@ -272,9 +276,6 @@ void Engine::run() {
     // Update total time since engine started
     m_totalTime = std::chrono::duration<float>(currentTime - m_engineStartTime).count();
 
-    // Process all pending window events (keyboard, mouse, window operations)
-    processEvents();
-
     // LOG_INFO_F("trans: {}", trans.length());
 
     // bind Texture
@@ -283,7 +284,10 @@ void Engine::run() {
 
     // Activate Shader & Create transformations
     shader.use();
-    glm::mat4 model, view, projection = glm::mat4(1.0f);
+    glm::mat4 model = glm::mat4(1.0f);
+    glm::mat4 view = glm::mat4(1.0f);
+    glm::mat4 projection = glm::mat4(1.0f);
+
     model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
     projection =
