@@ -19,14 +19,23 @@ void Texture::loadTexture(const char* filepath) {
     const int channels = m_texture_img.channels;
     LOG_INFO_F("Image has {} Channels", channels);
 
+    GLenum format;
     switch (channels) {
       case 1:
+        format = GL_RED;
         break;
       case 2:
+        format = GL_RG;
         break;
       case 3:
+        format = GL_RGB;
         break;
       case 4:
+        format = GL_RGBA;
+        break;
+      default:
+        LOG_ERROR_F("Issue with channel count: {}", channels);
+        format = GL_RGB;  // fallback
         break;
     };
 
@@ -36,7 +45,7 @@ void Texture::loadTexture(const char* filepath) {
                  m_texture_img.width,
                  m_texture_img.height,
                  0,
-                 GL_RGB,
+                 format,
                  GL_UNSIGNED_BYTE,
                  m_texture_img.data);
     glGenerateMipmap(GL_TEXTURE_2D);
