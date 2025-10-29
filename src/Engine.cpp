@@ -193,11 +193,12 @@ void Engine::run() {
     return;
   }
 
+  glEnable(GL_DEPTH_TEST);
+
   // INFO: --> Shader test starts here
   Shader shader("../resources/shaders/main.vert.glsl", "../resources/shaders/main.frag.glsl");
 
   // VAOs, VBOs, EBOs
-
   // clang-format off
 float vertices[] = {
     -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
@@ -243,10 +244,21 @@ float vertices[] = {
     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
 };
 
-  unsigned int indices[] = {  
-  0, 1, 3,
-  1, 2, 3
-  };
+glm::vec3 cubePositions[] = {glm::vec3(0.0f, 0.0f, 0.0f),
+                              glm::vec3(2.0f, 5.0f, -15.0f),
+                              glm::vec3(-1.5f, -2.2f, -2.5f),
+                              glm::vec3(-3.8f, -2.0f, -12.3f),
+                              glm::vec3(2.4f, -0.4f, -3.5f),
+                              glm::vec3(-1.7f, 3.0f, -7.5f),
+                              glm::vec3(1.3f, -2.0f, -2.5f),
+                              glm::vec3(1.5f, 2.0f, -2.5f),
+                              glm::vec3(1.5f, 0.2f, -1.5f),
+                              glm::vec3(-1.3f, 1.0f, -1.5f)};
+
+unsigned int indices[] = {  
+0, 1, 3,
+1, 2, 3
+};
   // clang-format on
 
   unsigned int vao, vbo, ebo;
@@ -301,19 +313,14 @@ float vertices[] = {
   LOG_INFO_F("checking the window config frame: {} x {}", m_config.windowWidth, m_config.windowHeight);
   auto start_time = std::chrono::high_resolution_clock::now();
   while (m_isRunning && !m_windowManager->shouldClose()) {
-    auto current_time = std::chrono::high_resolution_clock::now();
-
     processEvents();
+
+    auto current_time = std::chrono::high_resolution_clock::now();
+    auto dt = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - start_time);
+    auto dt_seconds = dt.count() / 1000.0f;
 
     glClearColor(0.1, 0.0, 0.5, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    // Process all pending window events (keyboard, mouse, window operations)
-    m_deltaTime = std::chrono::duration<float>(current_time - m_lastFrameTime).count();
-    // Caculate time since last frame for smooth, frame-rate independent updates
-    m_lastFrameTime = current_time;
-    // Update total time since engine started
-    m_totalTime = std::chrono::duration<float>(current_time - m_engineStartTime).count();
 
     // bind Texture
     texture0.bindTexture();
@@ -321,22 +328,27 @@ float vertices[] = {
 
     // Activate Shader & Create transformations
     shader.use();
-    glm::mat4 model = glm::mat4(1.0f);
+
     glm::mat4 view = glm::mat4(1.0f);
     glm::mat4 projection = glm::mat4(1.0f);
-
-    model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
     projection =
       glm::perspective(glm::radians(45.0f), (float)m_config.windowWidth / (float)m_config.windowHeight, 0.1f, 100.0f);
+    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
 
-    shader.setMat4("model", model);
-    shader.setMat4("view", view);
     shader.setMat4("projection", projection);
+    shader.setMat4("view", view);
 
     glBindVertexArray(vao);
+    for (unsigned int i = 0; i < 10; i++) {
+      glm::mat4 model = glm::mat4(1.0f);
+      model = glm::translate(model, cubePositions[i]);
+      float angle = 20.0f * i;
+      model = glm::rotate(model, dt_seconds * glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+      shader.setMat4("model", model);
+
+      glDrawArrays(GL_TRIANGLES, 0, 36);
+    };
     // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
 
     //  if (!m_isPaused) {
     // Update all game systems with the calculated delta time
@@ -354,6 +366,9 @@ float vertices[] = {
     // Handle scene transitions if needed
     // performSceneTransition();
   }
+
+  glDeleteVertexArrays(1, &vao);
+  glDeleteBuffers(1, &vbo);
 
   LOG_INFO("[Engine] Main engine loop ended");
 }
