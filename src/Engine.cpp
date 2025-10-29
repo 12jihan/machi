@@ -299,21 +299,21 @@ float vertices[] = {
   // LOG_INFO_F("[Engine]::[Shader] Max vertex attributes supported: {}", nrAttributes);
 
   LOG_INFO_F("checking the window config frame: {} x {}", m_config.windowWidth, m_config.windowHeight);
+  auto start_time = std::chrono::high_resolution_clock::now();
   while (m_isRunning && !m_windowManager->shouldClose()) {
-    // Process all pending window events (keyboard, mouse, window operations)
+    auto current_time = std::chrono::high_resolution_clock::now();
+
     processEvents();
 
     glClearColor(0.1, 0.0, 0.5, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // Process all pending window events (keyboard, mouse, window operations)
+    m_deltaTime = std::chrono::duration<float>(current_time - m_lastFrameTime).count();
     // Caculate time since last frame for smooth, frame-rate independent updates
-    auto currentTime = std::chrono::high_resolution_clock::now();
-    m_deltaTime = std::chrono::duration<float>(currentTime - m_lastFrameTime).count();
-    m_lastFrameTime = currentTime;
-
+    m_lastFrameTime = current_time;
     // Update total time since engine started
-    m_totalTime = std::chrono::duration<float>(currentTime - m_engineStartTime).count();
-
-    // LOG_INFO_F("trans: {}", trans.length());
+    m_totalTime = std::chrono::duration<float>(current_time - m_engineStartTime).count();
 
     // bind Texture
     texture0.bindTexture();
