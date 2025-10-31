@@ -5,7 +5,7 @@
 
 int main() {
   try {
-    Engine engine("MACHI-NGEN - OPENGL TEST", 1024, 768);
+    Engine engine("MACHI-NGEN - OPENGL TEST", 800, 600);
 
     if (!engine.initialize()) {
       std::cerr << "Failed to initialize engine!" << std::endl;

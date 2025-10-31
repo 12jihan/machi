@@ -301,17 +301,14 @@ unsigned int indices[] = {
 
   // Main engine, loop - this is the heart of your game engine
   LOG_INFO_F("[Engine]::[Shader] m_isPaused {}", m_isPaused);
-  // if (false) {
-  //   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-  // }
-
-  // Check how many attributes are available
-  // int nrAttributes;
-  // glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
-  // LOG_INFO_F("[Engine]::[Shader] Max vertex attributes supported: {}", nrAttributes);
 
   LOG_INFO_F("checking the window config frame: {} x {}", m_config.windowWidth, m_config.windowHeight);
   auto start_time = std::chrono::high_resolution_clock::now();
+
+  glm::mat4 projection =
+    glm::perspective(glm::radians(45.0f), (float)m_config.windowWidth / (float)m_config.windowHeight, 0.1f, 100.0f);
+  shader.setMat4("projection", projection);
+
   while (m_isRunning && !m_windowManager->shouldClose()) {
     processEvents();
 
@@ -329,13 +326,18 @@ unsigned int indices[] = {
     // Activate Shader & Create transformations
     shader.use();
 
-    glm::mat4 view = glm::mat4(1.0f);
-    glm::mat4 projection = glm::mat4(1.0f);
-    projection =
-      glm::perspective(glm::radians(45.0f), (float)m_config.windowWidth / (float)m_config.windowHeight, 0.1f, 100.0f);
-    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+    // glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+    // glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+    // glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
+    // glm::vec3 up = glm::vec3(0.0f, 0.0f, 0.0f);
+    // glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
+    // glm::vec3 cameraUp = glm::normalize(glm::cross(cameraDirection, cameraRight));
 
-    shader.setMat4("projection", projection);
+    glm::mat4 view = glm::mat4(1.0f);
+    float radius = 10.0f;
+    float camX = static_cast<float>(sin(dt_seconds * radius));
+    float camZ = static_cast<float>(cos(dt_seconds * radius));
+    view = glm::lookAt(glm::vec3(camX, 0.0f, camZ), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     shader.setMat4("view", view);
 
     glBindVertexArray(vao);
@@ -343,19 +345,12 @@ unsigned int indices[] = {
       glm::mat4 model = glm::mat4(1.0f);
       model = glm::translate(model, cubePositions[i]);
       float angle = 20.0f * i;
-      model = glm::rotate(model, dt_seconds * glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+      // model = glm::rotate(model, dt_seconds * glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+      model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
       shader.setMat4("model", model);
 
       glDrawArrays(GL_TRIANGLES, 0, 36);
     };
-    // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-    //  if (!m_isPaused) {
-    // Update all game systems with the calculated delta time
-    // updateSystems(m_deltaTime);
-
-    // Render the current frame
-    // renderFrame();
 
     m_windowManager->swapBuffers();
 
