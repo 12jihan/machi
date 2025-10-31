@@ -83,6 +83,8 @@ private:
   std::chrono::high_resolution_clock::time_point m_engineStartTime;
   float m_deltaTime;
   float m_totalTime;
+  float m_currentFrame;
+  float m_lastFrame;
   int m_frameCount;
   float m_fps;
   float m_fpsUpdateTimer;
@@ -114,6 +116,8 @@ private:
   void onMouseButton(int button, int action, int mods);
   void onMouseMove(double x, double y);
   void onScroll(double xOffset, double yOffset);
+
+  void keyTest(GLFWwindow* window);
 
   // Event system methods
   void dispatchEvent(const EngineEvent& event);

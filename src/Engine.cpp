@@ -16,12 +16,18 @@
 #include <sstream>
 #include <string>
 
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
 Engine::Engine(const EngineConfig& config) :
  m_config(config),
  m_isInitialized(false),
  m_isRunning(false),
  m_isPaused(false),
  m_deltaTime(0.0f),
+ m_lastFrame(0.0f),
+ m_currentFrame(0.0f),
  m_totalTime(0.0f),
  m_frameCount(0.0f),
  m_fps(0.0f),
@@ -310,11 +316,13 @@ unsigned int indices[] = {
   shader.setMat4("projection", projection);
 
   while (m_isRunning && !m_windowManager->shouldClose()) {
-    processEvents();
+    auto now = std::chrono::high_resolution_clock::now().time_since_epoch();
+    m_currentFrame = std::chrono::duration<float>(now).count();
+    m_deltaTime = m_currentFrame - m_lastFrame;
+    m_lastFrame = m_currentFrame;
 
-    auto current_time = std::chrono::high_resolution_clock::now();
-    auto dt = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - start_time);
-    auto dt_seconds = dt.count() / 1000.0f;
+    processEvents();
+    keyTest(m_windowManager->getWindow());
 
     glClearColor(0.1, 0.0, 0.5, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -325,19 +333,20 @@ unsigned int indices[] = {
 
     // Activate Shader & Create transformations
     shader.use();
-
+    //
     // glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-    // glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-    // glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
-    // glm::vec3 up = glm::vec3(0.0f, 0.0f, 0.0f);
+    // glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+    // glm::vec3 cameraUp = glm::vec3(0.0f, 0.0f, 0.0f);
+    // glm::vec3 cameraUp = glm::normalize(cameraPos - cameraTarget);
     // glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
     // glm::vec3 cameraUp = glm::normalize(glm::cross(cameraDirection, cameraRight));
 
     glm::mat4 view = glm::mat4(1.0f);
     float radius = 10.0f;
-    float camX = static_cast<float>(sin(dt_seconds) * radius);
-    float camZ = static_cast<float>(cos(dt_seconds) * radius);
-    view = glm::lookAt(glm::vec3(camX, 0.0f, camZ), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    float camX = static_cast<float>(sin(m_deltaTime) * radius);
+    float camZ = static_cast<float>(cos(m_deltaTime) * radius);
+    // view = glm::lookAt(glm::vec3(camX, 0.0f, camZ), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
     shader.setMat4("view", view);
 
     glBindVertexArray(vao);
@@ -458,6 +467,18 @@ void Engine::onKeyEvent(int key, int scancode, int action, int mods) {
 
   dispatchEvent(event);
 }
+
+void Engine::keyTest(GLFWwindow* window) {
+  const float cameraSpeed = 0.05f;
+  if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+    cameraPos += cameraSpeed * cameraFront;
+  if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+    cameraPos -= cameraSpeed * cameraFront;
+  if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+};
 
 void Engine::onMouseMove(double x, double y) {
   EngineEvent event;
