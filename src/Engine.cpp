@@ -335,8 +335,8 @@ unsigned int indices[] = {
 
     glm::mat4 view = glm::mat4(1.0f);
     float radius = 10.0f;
-    float camX = static_cast<float>(sin(dt_seconds * radius));
-    float camZ = static_cast<float>(cos(dt_seconds * radius));
+    float camX = static_cast<float>(sin(dt_seconds) * radius);
+    float camZ = static_cast<float>(cos(dt_seconds) * radius);
     view = glm::lookAt(glm::vec3(camX, 0.0f, camZ), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     shader.setMat4("view", view);
 
