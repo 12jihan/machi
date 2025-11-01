@@ -8,25 +8,36 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Generate compile_commands.json for LSP support (LazyVim, clangd, etc.)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_BUILD_TYPE Debug)
 
 # Find required packages
 find_package(glfw3 REQUIRED)
 find_package(glm REQUIRED)
 
 # Include directories
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/glad/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/glad/include)
+
+add_library(stb INTERFACE)
+target_include_directories(
+  stb
+  INTERFACE
+  ${CMAKE_CURRENT_SOURCE_DIR}/external/stb
+)
 
 # Adding Glad src files (assuming they're in lib folder)
-file(GLOB GLAD_SRC "${CMAKE_CURRENT_SOURCE_DIR}/lib/glad/src/*.c")
+file(GLOB GLAD_SRC "${CMAKE_CURRENT_SOURCE_DIR}/external/glad/src/*.c")
 
 # App sources -- explicitly list them out // I'm not for now because i'm lazy
 set(APP_SRC
   src/main.cpp
+  src/impl_stb.cpp
   src/WindowManager.cpp
   src/Engine.cpp
-  src/Scene.cpp
+  src/Shader.cpp
   src/Logger.cpp
   src/InputManager.cpp
+  src/Utils.cpp
+  src/Texture.cpp
 )
 
 # Create your executable
@@ -39,6 +50,7 @@ add_executable(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
     glfw
     glm::glm
+    stb
     ${CMAKE_DL_LIBS}  # For dynamic loading (needed by GLAD)
 )
 

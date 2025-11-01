@@ -1,11 +1,24 @@
 #include "../include/Engine.hpp"
 #include "../include/Logger.hpp"
+#include "../include/Shader.hpp"
+// #include "../include/Utils.hpp"
+#include "../include/Texture.hpp"
+
 #include <GLFW/glfw3.h>
+
 #include <chrono>
+#include <glm/ext/matrix_clip_space.hpp>
+#include <glm/ext/matrix_transform.hpp>
+#include <glm/fwd.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <iomanip>
 #include <memory>
 #include <sstream>
 #include <string>
+
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
 Engine::Engine(const EngineConfig& config) :
  m_config(config),
@@ -13,6 +26,8 @@ Engine::Engine(const EngineConfig& config) :
  m_isRunning(false),
  m_isPaused(false),
  m_deltaTime(0.0f),
+ m_lastFrame(0.0f),
+ m_currentFrame(0.0f),
  m_totalTime(0.0f),
  m_frameCount(0.0f),
  m_fps(0.0f),
@@ -103,6 +118,7 @@ bool Engine::initializeWindowSystem() {
   windowConfig.samples = m_config.msaaSamples;
 
   m_windowManager = std::make_unique<WindowManager>(windowConfig);
+
   if (!m_windowManager->initialize()) {
     LOG_ERROR("[Engine] Failed to initialize WindowManager");
     return false;
@@ -126,20 +142,20 @@ bool Engine::initializeWindowSystem() {
 };
 
 // TODO: extend the renderer class
-// bool Engine::intializeRenderingSystem() {
-//   LOG_INFO("[Engine] Initializing rendering system...");
-//   // Set up basic OpenGL state based on our configuration
-//   setClearColor(m_config.clearR, m_config.clearG, m_config.clearB, m_config.clearA);
-//   enableDepthTest(m_config.enableDepthTest);
-//   enableBlending(m_config.enableBlending);
-//
-//   // Set initial viewport to match window size
-//   auto [width, height] = m_windowManager->getSize();
-//   glViewport(0, 0, width, height);
-//
-//   LOG_INFO("[Engine] Rendering system initialized successfully");
-//   return true;
-// }
+bool Engine::initializeRenderingSystem() {
+  LOG_INFO("[Engine] Initializing rendering system...");
+  // Set up basic OpenGL state based on our configuration
+  setClearColor(m_config.clearR, m_config.clearG, m_config.clearB, m_config.clearA);
+  enableDepthTest(m_config.enableDepthTest);
+  enableBlending(m_config.enableBlending);
+
+  // Set initial viewport to match window size
+  auto [width, height] = m_windowManager->getSize();
+  glViewport(0, 0, width, height);
+
+  LOG_INFO("[Engine] Rendering system initialized successfully");
+  return true;
+}
 
 bool Engine::initializeInputSystem() {
   LOG_INFO("[Engine] Initializing input system...");
@@ -183,203 +199,189 @@ void Engine::run() {
     return;
   }
 
+  glEnable(GL_DEPTH_TEST);
+
   // INFO: --> Shader test starts here
-  const char* vShaderSrc = R"(
-    #version 330 core
-    layout (location = 0) in vec3 aPos;
-
-    void main()
-    {
-      gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0f);
-    }
-  )";
-
-  const char* fShaderSrc = R"(
-    #version 330 core
-    out vec4 FragColor;
-
-    void main()
-    {
-      FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
-    }
-  )";
-
-  int success;
-  char infoLog[512];
-
-  // vshader
-  unsigned vShader;
-  vShader = glCreateShader(GL_VERTEX_SHADER);
-  glShaderSource(vShader, 1, &vShaderSrc, nullptr);
-  glCompileShader(vShader);
-
-  // Check error for vshader
-  glGetShaderiv(vShader, GL_COMPILE_STATUS, &success);
-  if (!success) {
-    glGetShaderInfoLog(vShader, 512, nullptr, infoLog);
-    LOG_ERROR_F("[Engine] there was an error with the vShader: {}", infoLog);
-  };
-
-  // fshader
-  unsigned fShader;
-  fShader = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(fShader, 1, &fShaderSrc, nullptr);
-  glCompileShader(fShader);
-
-  // Check error for fshader
-  glGetShaderiv(fShader, GL_COMPILE_STATUS, &success);
-  if (!success) {
-    glGetShaderInfoLog(fShader, 512, nullptr, infoLog);
-    LOG_ERROR_F("[Engine] there was an error with the fShader: {}", infoLog);
-  };
-
-  // Shader program
-  unsigned int shaderProgram;
-  shaderProgram = glCreateProgram();
-  glAttachShader(shaderProgram, vShader);
-  glAttachShader(shaderProgram, fShader);
-  glLinkProgram(shaderProgram);
-
-  // Check error for shader program
-  glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-  if (!success) {
-    glGetProgramInfoLog(shaderProgram, 512, nullptr, infoLog);
-    LOG_ERROR_F("[Engine] there was an error with the shader program: {}", infoLog);
-  }
-
-  // Delete the shaders when don't using program?
-  glDeleteShader(vShader);
-  glDeleteShader(fShader);
+  Shader shader("../resources/shaders/main.vert.glsl", "../resources/shaders/main.frag.glsl");
 
   // VAOs, VBOs, EBOs
-  // float vertices[] = {-0.5f, -0.5f, 0.0f, 0.5f, -0.5f, 0.0f, 0.0f, 0.5f, 0.0f};
   // clang-format off
-  float vertices[] = {
-     0.5f,  0.5f,  0.0f,  // top right
-     0.5f, -0.5f,  0.0f,  // bottom right
-    -0.5f, -0.5f,  0.0f,  // bottom left
-    -0.5f, 0.5f, 0.0f,  // top left
-    0.0f, 0.0f, 0.0f   // center point 
-  };
-  unsigned int indices[] = {  // note that we start from 0!
-    0, 1,   4,   // first triangle 
-    1, 2,   4,   // second triangle
-    2, 3,   4,   // third triangle
-    3,0,  4,    // fourth triangle
-  };
+float vertices[] = {
+    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+};
+
+glm::vec3 cubePositions[] = {glm::vec3(0.0f, 0.0f, 0.0f),
+                              glm::vec3(2.0f, 5.0f, -15.0f),
+                              glm::vec3(-1.5f, -2.2f, -2.5f),
+                              glm::vec3(-3.8f, -2.0f, -12.3f),
+                              glm::vec3(2.4f, -0.4f, -3.5f),
+                              glm::vec3(-1.7f, 3.0f, -7.5f),
+                              glm::vec3(1.3f, -2.0f, -2.5f),
+                              glm::vec3(1.5f, 2.0f, -2.5f),
+                              glm::vec3(1.5f, 0.2f, -1.5f),
+                              glm::vec3(-1.3f, 1.0f, -1.5f)};
+
+unsigned int indices[] = {  
+0, 1, 3,
+1, 2, 3
+};
   // clang-format on
+
   unsigned int vao, vbo, ebo;
   glGenVertexArrays(1, &vao);
   glGenBuffers(1, &vbo);
   glGenBuffers(1, &ebo);
 
+  // vao
   glBindVertexArray(vao);
 
+  // vbo
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
+  // ebo
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+  // position attribute
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), nullptr);
   glEnableVertexAttribArray(0);
 
-  // INFO: --> Shader test ends here
+  // texture attribute
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), reinterpret_cast<void*>(3 * sizeof(float)));
+  glEnableVertexAttribArray(1);
 
-  LOG_INFO("[Engine] startiing main engine loop...");
+  // Load and create texture
+  Texture texture0(0, "../resources/textures/wood_texture/wood_texture.png");
+  Texture texture1(1, "../resources/textures/awesomeface.png");
+
+  // Use Shader
+  shader.use();
+  shader.setInt("texture0", 0);
+  shader.setInt("texture1", 1);
+
+  // INFO: --> Shader test ends here
+  LOG_INFO("[ENGINE] starting main engine loop...");
   m_isRunning = true;
   m_lastFrameTime = std::chrono::high_resolution_clock::now();
 
-  // set wireframe mode for testing (like your current setup)
-  // TODO: Render class needs to be extended
-  // if (m_renderer) {
-  //   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-  // }
   // Main engine, loop - this is the heart of your game engine
+  LOG_INFO_F("[Engine]::[Shader] m_isPaused {}", m_isPaused);
+
+  LOG_INFO_F("checking the window config frame: {} x {}", m_config.windowWidth, m_config.windowHeight);
+  auto start_time = std::chrono::high_resolution_clock::now();
+
+  glm::mat4 projection =
+    glm::perspective(glm::radians(45.0f), (float)m_config.windowWidth / (float)m_config.windowHeight, 0.1f, 100.0f);
+  shader.setMat4("projection", projection);
+  float yaw = -90.0f;
+  float pitch = -90.0f;
+
+  glm::vec3 direction;
+  direction.x = cos(glm::radians(yaw) * cos(glm::radians(pitch)));
+  direction.y = sin(glm::radians(pitch));
+  direction.z = sin(glm::radians(yaw) * cos(glm::radians(pitch)));
+
   while (m_isRunning && !m_windowManager->shouldClose()) {
-    // Caculate time since last frame for smooth, frame-rate independent updates
-    auto currentTime = std::chrono::high_resolution_clock::now();
-    m_deltaTime = std::chrono::duration<float>(currentTime - m_lastFrameTime).count();
-    m_lastFrameTime = currentTime;
+    auto now = std::chrono::high_resolution_clock::now().time_since_epoch();
+    m_currentFrame = std::chrono::duration<float>(now).count();
+    m_deltaTime = m_currentFrame - m_lastFrame;
+    m_lastFrame = m_currentFrame;
 
-    // Update total time since engine started
-    m_totalTime = std::chrono::duration<float>(currentTime - m_engineStartTime).count();
-
-    // Process all pending window events (keyboard, mouse, window operations)
     processEvents();
+    keyTest(m_windowManager->getWindow());
 
-    // Only update and render if we're not paused
-    if (!m_isPaused) {
-      // Update all game systems with the calculated delta time
-      updateSystems(m_deltaTime);
+    glClearColor(0.1, 0.0, 0.5, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-      // Render the current frame
-      renderFrame();
+    // bind Texture
+    texture0.bindTexture();
+    texture1.bindTexture();
 
-      // Update frame statistics for performance monitoring
-      calculateFrameStats();
-    }
+    // Activate Shader & Create transformations
+    shader.use();
+    //
+    // glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+    // glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+    // glm::vec3 cameraUp = glm::vec3(0.0f, 0.0f, 0.0f);
+    // glm::vec3 cameraUp = glm::normalize(cameraPos - cameraTarget);
+    // glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
+    // glm::vec3 cameraUp = glm::normalize(glm::cross(cameraDirection, cameraRight));
+
+    glm::mat4 view = glm::mat4(1.0f);
+    float radius = 10.0f;
+    float camX = static_cast<float>(sin(m_deltaTime) * radius);
+    float camZ = static_cast<float>(cos(m_deltaTime) * radius);
+    // view = glm::lookAt(glm::vec3(camX, 0.0f, camZ), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+    shader.setMat4("view", view);
+
+    glBindVertexArray(vao);
+    for (unsigned int i = 0; i < 10; i++) {
+      glm::mat4 model = glm::mat4(1.0f);
+      model = glm::translate(model, cubePositions[i]);
+      float angle = 20.0f * i;
+      // model = glm::rotate(model, dt_seconds * glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+      model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+      shader.setMat4("model", model);
+
+      glDrawArrays(GL_TRIANGLES, 0, 36);
+    };
+
+    m_windowManager->swapBuffers();
+
+    // Update frame statistics for performance monitoring
+    calculateFrameStats();
+    // }
     // TODO: Create Scene class
     // Handle scene transitions if needed
     // performSceneTransition();
   }
 
+  glDeleteVertexArrays(1, &vao);
+  glDeleteBuffers(1, &vbo);
+
   LOG_INFO("[Engine] Main engine loop ended");
-}
-
-void Engine::rbTest() {
-  if (!m_isInitialized) {
-    LOG_ERROR("[Engine] Cannot run - engine not initialized!");
-    return;
-  }
-
-  LOG_INFO("[Engine] Starting minimal triangle test...");
-
-  // Make sure OpenGL context is current
-  m_windowManager->makeContextCurrent();
-
-  // Test if OpenGL is working AT ALL
-  glClearColor(1.0f, 0.0f, 0.0f, 1.0f);  // RED background
-  glClear(GL_COLOR_BUFFER_BIT);
-  m_windowManager->swapBuffers();
-
-  LOG_INFO("[Engine] Red screen test - do you see a red background? (waiting 2 seconds)");
-
-  // Wait 2 seconds so you can see the red screen
-  auto start = std::chrono::high_resolution_clock::now();
-  while (std::chrono::duration<float>(std::chrono::high_resolution_clock::now() - start).count() < 2.0f) {
-    m_windowManager->pollEvents();
-    if (m_windowManager->shouldClose())
-      return;
-  }
-
-  // If you see red background, OpenGL is working. If not, that's the problem!
-
-  LOG_INFO("[Engine] Now testing blue background...");
-  glClearColor(0.0f, 0.0f, 1.0f, 1.0f);  // BLUE background
-  glClear(GL_COLOR_BUFFER_BIT);
-  m_windowManager->swapBuffers();
-
-  // Wait another 2 seconds
-  start = std::chrono::high_resolution_clock::now();
-  while (std::chrono::duration<float>(std::chrono::high_resolution_clock::now() - start).count() < 2.0f) {
-    m_windowManager->pollEvents();
-    if (m_windowManager->shouldClose())
-      return;
-  }
-
-  LOG_INFO("[Engine] If you saw red then blue, OpenGL clearing works!");
-  LOG_INFO("[Engine] Press ESC or close window to exit");
-
-  // Simple event loop
-  while (!m_windowManager->shouldClose()) {
-    m_windowManager->pollEvents();
-
-    // Keep showing blue screen
-    glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
-    m_windowManager->swapBuffers();
-  }
 }
 
 void Engine::processEvents() {
@@ -406,6 +408,7 @@ void Engine::updateSystems(float deltaTime) {
 };
 
 void Engine::renderFrame() {
+  LOG_INFO("[Engine] running renderer");
   // Clear the screen with our configured background color
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -463,14 +466,26 @@ void Engine::onWindowResize(int width, int height) {
 }
 
 void Engine::onKeyEvent(int key, int scancode, int action, int mods) {
+  LOG_DEBUG_F("Key Pressed: {}, {}", key, action);
   EngineEvent event;
   event.type =
     (action == GLFW_PRESS || action == GLFW_REPEAT) ? EngineEventType::KeyPress : EngineEventType::KeyRelease;
   event.data.keyboard = {key, scancode, mods};
   event.timestamp = m_totalTime;
-
   dispatchEvent(event);
 }
+
+void Engine::keyTest(GLFWwindow* window) {
+  const float cameraSpeed = 0.05f;
+  if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+    cameraPos += cameraSpeed * cameraFront;
+  if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+    cameraPos -= cameraSpeed * cameraFront;
+  if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+};
 
 void Engine::onMouseMove(double x, double y) {
   EngineEvent event;

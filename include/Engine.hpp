@@ -83,6 +83,8 @@ private:
   std::chrono::high_resolution_clock::time_point m_engineStartTime;
   float m_deltaTime;
   float m_totalTime;
+  float m_currentFrame;
+  float m_lastFrame;
   int m_frameCount;
   float m_fps;
   float m_fpsUpdateTimer;
@@ -115,6 +117,8 @@ private:
   void onMouseMove(double x, double y);
   void onScroll(double xOffset, double yOffset);
 
+  void keyTest(GLFWwindow* window);
+
   // Event system methods
   void dispatchEvent(const EngineEvent& event);
   void processEventQueue();
@@ -144,7 +148,6 @@ public:
   // Core engine lifecycle - the main interface for using the engine
   bool initialize();
   void run();
-  void rbTest();
   void shutdown();
   void pause();
   void resume();
@@ -218,7 +221,7 @@ public:
 
   // Static utility methods
   static std::string getEngineVersion() {
-    return "1.0.0";
+    return "0.0.08";
   }
   static std::string getBuildInfo();  // Implementation will include compile time, OpengGL version, etc.
 };
