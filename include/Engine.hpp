@@ -221,7 +221,7 @@ public:
 
   // Static utility methods
   static std::string getEngineVersion() {
-    return "1.0.0";
+    return "0.0.08";
   }
   static std::string getBuildInfo();  // Implementation will include compile time, OpengGL version, etc.
 };

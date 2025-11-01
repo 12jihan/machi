@@ -314,6 +314,13 @@ unsigned int indices[] = {
   glm::mat4 projection =
     glm::perspective(glm::radians(45.0f), (float)m_config.windowWidth / (float)m_config.windowHeight, 0.1f, 100.0f);
   shader.setMat4("projection", projection);
+  float yaw = -90.0f;
+  float pitch = -90.0f;
+
+  glm::vec3 direction;
+  direction.x = cos(glm::radians(yaw) * cos(glm::radians(pitch)));
+  direction.y = sin(glm::radians(pitch));
+  direction.z = sin(glm::radians(yaw) * cos(glm::radians(pitch)));
 
   while (m_isRunning && !m_windowManager->shouldClose()) {
     auto now = std::chrono::high_resolution_clock::now().time_since_epoch();
@@ -459,12 +466,12 @@ void Engine::onWindowResize(int width, int height) {
 }
 
 void Engine::onKeyEvent(int key, int scancode, int action, int mods) {
+  LOG_DEBUG_F("Key Pressed: {}, {}", key, action);
   EngineEvent event;
   event.type =
     (action == GLFW_PRESS || action == GLFW_REPEAT) ? EngineEventType::KeyPress : EngineEventType::KeyRelease;
   event.data.keyboard = {key, scancode, mods};
   event.timestamp = m_totalTime;
-
   dispatchEvent(event);
 }
 
