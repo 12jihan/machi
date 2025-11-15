@@ -20,6 +20,9 @@ Think of MACHI as the backbone of a game—it manages all the core plumbing so y
 - **3D Camera Controls** - Keyboard-controlled camera movement (WASD)
 - **Frame Timing** - Delta-time calculations and FPS monitoring
 - **Comprehensive Logging** - File and console logging for debugging
+- **Utility System** - File loading and image processing utilities
+- **Graphics Features** - VSync control, MSAA anti-aliasing, fullscreen toggle, depth testing, blending
+- **Debug Tools** - System info printing, frame statistics, and profiling helpers
 
 ### Planned
 - Scene Management (SceneManager)
@@ -131,6 +134,10 @@ Engine Loop (main game loop)
 
 **Logger** - Configurable logging system with file output support.
 
+**Utils** - Utility functions for file I/O and image loading/processing.
+
+**Renderer** - Rendering abstraction layer (in development).
+
 ## Usage Examples
 
 ### Configuring the Engine
@@ -140,11 +147,18 @@ EngineConfig config;
 config.windowTitle = "My Game";
 config.windowWidth = 1280;
 config.windowHeight = 720;
+config.fullscreen = false;
+config.vsync = true;
 config.targetFPS = 60.0f;
-config.enableVSync = true;
+config.showFPSInTitle = true;
 config.clearR = 0.1f;
 config.clearG = 0.1f;
 config.clearB = 0.1f;
+config.enableDepthTest = true;
+config.enableBlending = false;
+config.msaaSamples = 4;  // Anti-aliasing
+config.enableLogging = true;
+config.logFile = "engine.log";
 
 Engine engine(config);
 engine.initialize();
@@ -172,11 +186,29 @@ float fps = engine.getFPS();
 engine.setClearColor(0.2f, 0.3f, 0.4f, 1.0f);
 engine.enableDepthTest(true);
 engine.setWindowSize(1920, 1080);
+engine.toggleFullscreen();
+engine.enableVSync(true);
 
 // Control execution
 engine.pause();
 engine.resume();
 engine.shutdown();
+```
+
+### Using the Utility System
+
+```cpp
+#include "Utils.hpp"
+
+// Load shader source files
+std::string vertexShader = Utils::loadFile("shaders/vertex.glsl");
+std::string fragmentShader = Utils::loadFile("shaders/fragment.glsl");
+
+// Load images for textures
+Utils::Image img = Utils::loadImage("textures/sprite.png");
+// Use img.data, img.width, img.height, img.channels
+// Don't forget to free when done
+Utils::freeImage(img);
 ```
 
 ## Keyboard Controls
@@ -195,17 +227,25 @@ machi-engine/
 ├── include/           # Header files
 │   ├── Engine.hpp
 │   ├── WindowManager.hpp
+│   ├── InputManager.hpp
+│   ├── Renderer.hpp
+│   ├── Scene.hpp
 │   ├── Shader.hpp
 │   ├── Texture.hpp
 │   ├── Logger.hpp
-│   └── InputManager.hpp
+│   └── Utils.hpp
 ├── src/              # Implementation files
 │   ├── main.cpp
 │   ├── Engine.cpp
 │   ├── WindowManager.cpp
+│   ├── InputManager.cpp
+│   ├── Renderer.cpp
+│   ├── Scene.cpp
 │   ├── Shader.cpp
 │   ├── Texture.cpp
-│   └── Logger.cpp
+│   ├── Logger.cpp
+│   ├── Utils.cpp
+│   └── impl_stb.cpp
 ├── external/         # Third-party libraries
 │   ├── glad/
 │   └── stb/
@@ -226,17 +266,22 @@ machi-engine/
 
 ## Development Roadmap
 
-### Phase 1 (Current)
+### Phase 1 (Completed)
 - [x] Window management
 - [x] Basic rendering pipeline
 - [x] Event system
 - [x] Input handling
 - [x] Logging system
+- [x] Utility system (file/image loading)
+- [x] Graphics features (VSync, MSAA, fullscreen)
+- [x] Debug and profiling tools
 
 ### Phase 2 (In Progress)
-- [ ] Scene Management
-- [ ] Renderer abstraction layer
+- [x] Renderer abstraction layer (initial structure)
+- [x] Scene Management (initial structure)
 - [ ] Extended camera system
+- [ ] Full renderer implementation
+- [ ] Complete scene management system
 
 ### Phase 3 (Planned)
 - [ ] Physics engine
