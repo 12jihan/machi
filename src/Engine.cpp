@@ -561,6 +561,9 @@ std::array<int, 2> Engine::getWindowSize() const {
 }
 
 void Engine::setWindowSize(int width, int height) {
+  EngineEvent resizeEvent;
+  resizeEvent.type = EngineEventType::WindowResize;
+
   if (m_windowManager) {
     m_windowManager->setSize(width, height);
     m_config.windowWidth = width;
