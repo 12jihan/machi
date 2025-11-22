@@ -521,6 +521,10 @@ void Engine::processEventQueue() {
       handler(event);
     }
   }
+
+  if (!m_eventQueue.empty()) {
+    m_eventQueue.clear();
+  };
 }
 
 // TODO: Implement Scene class
