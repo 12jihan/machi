@@ -135,7 +135,7 @@ bool Engine::initializeWindowSystem() {
 
   m_windowManager->setScrollCallback([this](double xOffset, double yOffset) { onScroll(xOffset, yOffset); });
 
-  // m_windowManager->setMouseMoveCallback([this](double x, double y) -> void { onMouseMove(x, y); });
+  m_windowManager->setMouseMoveCallback([this](double x, double y) -> void { onMouseMove(x, y); });
 
   LOG_INFO("[Engine] Window system intialized sucessfully");
   return true;
@@ -235,6 +235,12 @@ bool Engine::initializeInputSystem() {
           LOG_INFO_F("Key Pressed: {}", "Q");
           break;
       }
+    }
+  });
+
+  addEventListener([this](const EngineEvent& event) -> void {
+    if (event.type == EngineEventType::MouseMove && m_isRunning) {
+      LOG_INFO_F("Mouse Position: ({}, {})", event.data.mousePos.x, event.data.mousePos.y);
     }
   });
 
