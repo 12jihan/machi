@@ -210,6 +210,34 @@ bool Engine::initializeInputSystem() {
     }
   });
 
+  addEventListener([this](const EngineEvent& event) -> void {
+    if (event.type == EngineEventType::KeyPress && m_isRunning) {
+      switch (event.data.keyboard.key) {
+        case GLFW_KEY_W:
+          LOG_INFO_F("Key Pressed: {}", "W");
+          break;
+        case GLFW_KEY_A:
+          LOG_INFO_F("Key Pressed: {}", "A");
+          break;
+        case GLFW_KEY_S:
+          LOG_INFO_F("Key Pressed: {}", "S");
+          break;
+        case GLFW_KEY_D:
+          LOG_INFO_F("Key Pressed: {}", "D");
+          break;
+        case GLFW_KEY_F:
+          LOG_INFO_F("Key Pressed: {}", "F");
+          break;
+        case GLFW_KEY_E:
+          LOG_INFO_F("Key Pressed: {}", "E");
+          break;
+        case GLFW_KEY_Q:
+          LOG_INFO_F("Key Pressed: {}", "Q");
+          break;
+      }
+    }
+  });
+
   LOG_INFO("[Engine] Input system intialized successfully");
   return true;
 }
