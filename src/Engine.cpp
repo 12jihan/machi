@@ -76,7 +76,7 @@ bool Engine::initialize() {
       LOG_ERROR("[Engine] Failed to initialize window system!");
       return false;
     }
-    // @TODO: Create Render class
+    // TODO: Create Render class
     // if (!initializeRenderingSystem()) {
     //   LOG_ERROR("[Engine] Failed to initialize rendering system!");
     //   return false;
@@ -130,12 +130,12 @@ bool Engine::initializeWindowSystem() {
   m_windowManager->setKeyCallback(
     [this](int key, int scancode, int actions, int mods) -> void { onKeyEvent(key, scancode, actions, mods); });
 
-  // m_windowManager->setMouseButtonCallback(
-  // [this](int button, int action, int mods) -> void { onMouseButton(button, action, mods); });
-
-  m_windowManager->setMouseMoveCallback([this](double x, double y) -> void { onMouseMove(x, y); });
+  m_windowManager->setMouseButtonCallback(
+    [this](int button, int action, int mods) -> void { onMouseButton(button, action, mods); });
 
   m_windowManager->setScrollCallback([this](double xOffset, double yOffset) { onScroll(xOffset, yOffset); });
+
+  // m_windowManager->setMouseMoveCallback([this](double x, double y) -> void { onMouseMove(x, y); });
 
   LOG_INFO("[Engine] Window system intialized sucessfully");
   return true;
@@ -159,9 +159,9 @@ bool Engine::initializeRenderingSystem() {
 
 bool Engine::initializeInputSystem() {
   LOG_INFO("[Engine] Initializing input system...");
+
   addEventListener([this](const EngineEvent& event) {
-    if (event.type == EngineEventType::KeyPress) {
-      // Handle common engine shortcuts
+    if (event.type == EngineEventType::KeyPress && m_isRunning) {
       switch (event.data.keyboard.key) {
         case GLFW_KEY_ESCAPE:
           LOG_INFO("[Engine] Escape pressed - requesting shutdown");
@@ -172,15 +172,69 @@ bool Engine::initializeInputSystem() {
           m_windowManager->toggleFullscreen();
           break;
         case GLFW_KEY_F1:
-          // F1 for debug info
           printFrameStats();
           break;
       }
     }
+  });
 
-    if (event.type == EngineEventType::WindowClose) {
-      LOG_INFO("[Engine] Window close requested");
-      requestShutdown();
+  addEventListener([this](const EngineEvent& event) {
+    if (event.type == EngineEventType::MousePress && m_isRunning) {
+      switch (event.data.mouse.button) {
+        case GLFW_MOUSE_BUTTON_1:
+          LOG_INFO("[Engine] Mouse Button 1 Pressed.");
+          break;
+        case GLFW_MOUSE_BUTTON_2:
+          LOG_INFO("[Engine] Mouse Button 2 Pressed.");
+          break;
+        case GLFW_MOUSE_BUTTON_3:
+          LOG_INFO("[Engine] Mouse Button 3 Pressed.");
+          break;
+        case GLFW_MOUSE_BUTTON_4:
+          LOG_INFO("[Engine] Mouse Button 4 Pressed.");
+          break;
+        case GLFW_MOUSE_BUTTON_5:
+          LOG_INFO("[Engine] Mouse Button 5 Pressed.");
+          break;
+        case GLFW_MOUSE_BUTTON_6:
+          LOG_INFO("[Engine] Mouse Button 6 Pressed.");
+          break;
+      }
+    }
+  });
+
+  addEventListener([this](const EngineEvent& event) {
+    if (event.type == EngineEventType::MouseScroll && m_isRunning) {
+      float scrollAmount = static_cast<float>(event.data.scroll.yOffset);
+      LOG_INFO_F("[Engine] Scroll amount: {}", scrollAmount);
+    }
+  });
+
+  addEventListener([this](const EngineEvent& event) -> void {
+    if (event.type == EngineEventType::KeyPress && m_isRunning) {
+      switch (event.data.keyboard.key) {
+        case GLFW_KEY_W:
+          LOG_INFO_F("Key Pressed: {}", "W");
+          break;
+        case GLFW_KEY_A:
+          LOG_INFO_F("Key Pressed: {}", "A");
+          break;
+        case GLFW_KEY_S:
+          LOG_INFO_F("Key Pressed: {}", "S");
+          break;
+        case GLFW_KEY_D:
+          LOG_INFO_F("Key Pressed: {}", "D");
+          break;
+        case GLFW_KEY_F:
+          LOG_INFO_F("Key Pressed: {}", "F");
+          break;
+        case GLFW_KEY_E:
+          LOG_INFO_F("Key Pressed: {}", "E");
+          break;
+        case GLFW_KEY_Q:
+          LOG_INFO_F("Key Pressed: {}", "Q");
+          break;
+      }
     }
   });
 
@@ -206,65 +260,67 @@ void Engine::run() {
 
   // VAOs, VBOs, EBOs
   // clang-format off
-float vertices[] = {
-    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+  float vertices[] = {
+      -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+      0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+      0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+      0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+      -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+      -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
 
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+      -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+      0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+      0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+      0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+      -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+      -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
 
-    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+      -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+      -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+      -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+      -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+      -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+      -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
 
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+      0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+      0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+      0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+      0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+      0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+      0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
 
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+      -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+      0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+      0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+      0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+      -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+      -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
 
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-};
+      -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+      0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+      0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+      0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+      -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+      -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+  };
 
-glm::vec3 cubePositions[] = {glm::vec3(0.0f, 0.0f, 0.0f),
-                              glm::vec3(2.0f, 5.0f, -15.0f),
-                              glm::vec3(-1.5f, -2.2f, -2.5f),
-                              glm::vec3(-3.8f, -2.0f, -12.3f),
-                              glm::vec3(2.4f, -0.4f, -3.5f),
-                              glm::vec3(-1.7f, 3.0f, -7.5f),
-                              glm::vec3(1.3f, -2.0f, -2.5f),
-                              glm::vec3(1.5f, 2.0f, -2.5f),
-                              glm::vec3(1.5f, 0.2f, -1.5f),
-                              glm::vec3(-1.3f, 1.0f, -1.5f)};
+  glm::vec3 cubePositions[] = {
+    glm::vec3(0.0f, 0.0f, 0.0f),
+    glm::vec3(2.0f, 5.0f, -15.0f),
+    glm::vec3(-1.5f, -2.2f, -2.5f),
+    glm::vec3(-3.8f, -2.0f, -12.3f),
+    glm::vec3(2.4f, -0.4f, -3.5f),
+    glm::vec3(-1.7f, 3.0f, -7.5f),
+    glm::vec3(1.3f, -2.0f, -2.5f),
+    glm::vec3(1.5f, 2.0f, -2.5f),
+    glm::vec3(1.5f, 0.2f, -1.5f),
+    glm::vec3(-1.3f, 1.0f, -1.5f)
+  };
 
-unsigned int indices[] = {  
-0, 1, 3,
-1, 2, 3
-};
+  unsigned int indices[] = {  
+    0, 1, 3,
+    1, 2, 3
+  };
   // clang-format on
 
   unsigned int vao, vbo, ebo;
@@ -329,7 +385,9 @@ unsigned int indices[] = {
     m_lastFrame = m_currentFrame;
 
     processEvents();
-    keyTest(m_windowManager->getWindow());
+    if (!m_isRunning)
+      break;
+    // keyTest(m_windowManager->getWindow());
 
     glClearColor(0.1, 0.0, 0.5, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -393,7 +451,7 @@ void Engine::processEvents() {
 }
 
 void Engine::updateSystems(float deltaTime) {
-  // @TODO: implement Scene class
+  // TODO: implement Scene class
   // Update the current scene if we have one
   // if (m_currentScene) {
   //   m_currentScene->update(deltaTime);
@@ -475,6 +533,17 @@ void Engine::onKeyEvent(int key, int scancode, int action, int mods) {
   dispatchEvent(event);
 }
 
+void Engine::onMouseButton(int button, int action, int mods) {
+  LOG_DEBUG_F("Mouse Button Pressed: {}", button);
+
+  EngineEvent event;
+  event.type =
+    (action == GLFW_PRESS || action == GLFW_REPEAT) ? EngineEventType::MousePress : EngineEventType::MouseRelease;
+  event.data.mouse = {button, mods};
+  event.timestamp = m_totalTime;
+  dispatchEvent(event);
+}
+
 void Engine::keyTest(GLFWwindow* window) {
   const float cameraSpeed = 0.05f;
   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
@@ -492,24 +561,24 @@ void Engine::onMouseMove(double x, double y) {
   event.type = EngineEventType::MouseMove;
   event.data.mousePos = {x, y};
   event.timestamp = m_totalTime;
-
+  LOG_DEBUG_F("Mouse Movement: {}, {}", x, y);
   dispatchEvent(event);
 }
 
 void Engine::onScroll(double xOffset, double yOffset) {
   // Could be extended to log scrolls
-  // EngineEvent event;
-  // event.type = EngineEventType::Scroll;
-  // event.data.mousePos = {x, y};
-  // event.timestamp = m_totalTime;
+  EngineEvent event;
+  event.type = EngineEventType::MouseScroll;
+  event.data.scroll = {xOffset, yOffset};
+  event.timestamp = m_totalTime;
 
-  // dispatchEvent(event);
+  dispatchEvent(event);
 
   LOG_DEBUG_F("[Engine] Mouse scroll: ({}, {})", xOffset, yOffset);
 }
 
 void Engine::dispatchEvent(const EngineEvent& event) {
-  // Add event to our queue for processing
+  // Add event to queue for processing
   m_eventQueue.push_back(event);
 }
 
@@ -521,6 +590,10 @@ void Engine::processEventQueue() {
       handler(event);
     }
   }
+
+  if (!m_eventQueue.empty()) {
+    m_eventQueue.clear();
+  };
 }
 
 // TODO: Implement Scene class
@@ -561,6 +634,9 @@ std::array<int, 2> Engine::getWindowSize() const {
 }
 
 void Engine::setWindowSize(int width, int height) {
+  EngineEvent resizeEvent;
+  resizeEvent.type = EngineEventType::WindowResize;
+
   if (m_windowManager) {
     m_windowManager->setSize(width, height);
     m_config.windowWidth = width;
@@ -648,14 +724,14 @@ void Engine::shutdown() {
   dispatchEvent(shutdownEvent);
   processEventQueue();
 
-  shutdownSystems();
+  // shutdownSystems();
 
   m_isInitialized = false;
   LOG_INFO("[Engine] Engine shutdown completed");
 }
 
 void Engine::shutdownSystems() {
-  // @TODO: Create Scene class
+  // TODO: Create Scene class
   // Clean up scenes
   // m_currentScene.reset();
   // m_nextScene.reset();
