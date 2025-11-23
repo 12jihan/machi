@@ -164,8 +164,10 @@ bool Engine::initializeInputSystem() {
       // Handle common engine shortcuts
       switch (event.data.keyboard.key) {
         case GLFW_KEY_ESCAPE:
-          LOG_INFO("[Engine] Escape pressed - requesting shutdown");
-          shutdown();
+          if (m_isRunning) {
+            LOG_INFO("[Engine] Escape pressed - requesting shutdown");
+            shutdown();
+          }
           break;
         case GLFW_KEY_F2:
           LOG_INFO("[Engine] F2 pressed - toggling fullscreen");
@@ -329,7 +331,9 @@ unsigned int indices[] = {
     m_lastFrame = m_currentFrame;
 
     processEvents();
-    keyTest(m_windowManager->getWindow());
+    if (!m_isRunning)
+      break;
+    // keyTest(m_windowManager->getWindow());
 
     glClearColor(0.1, 0.0, 0.5, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -655,14 +659,14 @@ void Engine::shutdown() {
   dispatchEvent(shutdownEvent);
   processEventQueue();
 
-  shutdownSystems();
+  // shutdownSystems();
 
   m_isInitialized = false;
   LOG_INFO("[Engine] Engine shutdown completed");
 }
 
 void Engine::shutdownSystems() {
-  // @TODO: Create Scene class
+  // TODO: Create Scene class
   // Clean up scenes
   // m_currentScene.reset();
   // m_nextScene.reset();
