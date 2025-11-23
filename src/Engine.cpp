@@ -76,7 +76,7 @@ bool Engine::initialize() {
       LOG_ERROR("[Engine] Failed to initialize window system!");
       return false;
     }
-    // @TODO: Create Render class
+    // TODO: Create Render class
     // if (!initializeRenderingSystem()) {
     //   LOG_ERROR("[Engine] Failed to initialize rendering system!");
     //   return false;
@@ -130,10 +130,10 @@ bool Engine::initializeWindowSystem() {
   m_windowManager->setKeyCallback(
     [this](int key, int scancode, int actions, int mods) -> void { onKeyEvent(key, scancode, actions, mods); });
 
-  // m_windowManager->setMouseButtonCallback(
-  // [this](int button, int action, int mods) -> void { onMouseButton(button, action, mods); });
+  m_windowManager->setMouseButtonCallback(
+    [this](int button, int action, int mods) -> void { onMouseButton(button, action, mods); });
 
-  m_windowManager->setMouseMoveCallback([this](double x, double y) -> void { onMouseMove(x, y); });
+  // m_windowManager->setMouseMoveCallback([this](double x, double y) -> void { onMouseMove(x, y); });
 
   m_windowManager->setScrollCallback([this](double xOffset, double yOffset) { onScroll(xOffset, yOffset); });
 
@@ -159,31 +159,40 @@ bool Engine::initializeRenderingSystem() {
 
 bool Engine::initializeInputSystem() {
   LOG_INFO("[Engine] Initializing input system...");
+
   addEventListener([this](const EngineEvent& event) {
     if (event.type == EngineEventType::KeyPress && m_isRunning) {
-      // Handle common engine shortcuts
       switch (event.data.keyboard.key) {
         case GLFW_KEY_ESCAPE:
-          // if (m_isRunning) {
           LOG_INFO("[Engine] Escape pressed - requesting shutdown");
           shutdown();
-          // }
           break;
         case GLFW_KEY_F2:
           LOG_INFO("[Engine] F2 pressed - toggling fullscreen");
           m_windowManager->toggleFullscreen();
           break;
         case GLFW_KEY_F1:
-          // F1 for debug info
           printFrameStats();
           break;
       }
     }
+  });
 
-    // if (event.type == EngineEventType::WindowClose) {
-    //   LOG_INFO("[Engine] Window close requested");
-    //   requestShutdown();
-    // }
+  addEventListener([this](const EngineEvent& event) {
+    if (event.type == EngineEventType::MousePress && m_isRunning) {
+      LOG_INFO_F("[Engine] Mouse Button {}", event.data.mouse.button);
+      switch (event.data.mouse.button) {
+        case GLFW_MOUSE_BUTTON_1:
+          LOG_INFO("[Engine] Mouse Button 1 Pressed.");
+          break;
+        case GLFW_MOUSE_BUTTON_2:
+          LOG_INFO("[Engine] Mouse Button 2 Pressed.");
+          break;
+        case GLFW_MOUSE_BUTTON_3:
+          LOG_INFO("[Engine] Mouse Button 3 Pressed.");
+          break;
+      }
+    }
   });
 
   LOG_INFO("[Engine] Input system intialized successfully");
@@ -399,7 +408,7 @@ void Engine::processEvents() {
 }
 
 void Engine::updateSystems(float deltaTime) {
-  // @TODO: implement Scene class
+  // TODO: implement Scene class
   // Update the current scene if we have one
   // if (m_currentScene) {
   //   m_currentScene->update(deltaTime);
@@ -481,6 +490,17 @@ void Engine::onKeyEvent(int key, int scancode, int action, int mods) {
   dispatchEvent(event);
 }
 
+void Engine::onMouseButton(int button, int action, int mods) {
+  LOG_DEBUG_F("Mouse Button Pressed: {}", button);
+
+  EngineEvent event;
+  event.type =
+    (action == GLFW_PRESS || action == GLFW_REPEAT) ? EngineEventType::MousePress : EngineEventType::MouseRelease;
+  event.data.mouse = {button, mods};
+  event.timestamp = m_totalTime;
+  dispatchEvent(event);
+}
+
 void Engine::keyTest(GLFWwindow* window) {
   const float cameraSpeed = 0.05f;
   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
@@ -498,7 +518,7 @@ void Engine::onMouseMove(double x, double y) {
   event.type = EngineEventType::MouseMove;
   event.data.mousePos = {x, y};
   event.timestamp = m_totalTime;
-
+  LOG_DEBUG_F("Mouse Movement: {}, {}", x, y);
   dispatchEvent(event);
 }
 
