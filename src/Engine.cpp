@@ -180,7 +180,6 @@ bool Engine::initializeInputSystem() {
 
   addEventListener([this](const EngineEvent& event) {
     if (event.type == EngineEventType::MousePress && m_isRunning) {
-      LOG_INFO_F("[Engine] Mouse Button {}", event.data.mouse.button);
       switch (event.data.mouse.button) {
         case GLFW_MOUSE_BUTTON_1:
           LOG_INFO("[Engine] Mouse Button 1 Pressed.");
@@ -190,6 +189,15 @@ bool Engine::initializeInputSystem() {
           break;
         case GLFW_MOUSE_BUTTON_3:
           LOG_INFO("[Engine] Mouse Button 3 Pressed.");
+          break;
+        case GLFW_MOUSE_BUTTON_4:
+          LOG_INFO("[Engine] Mouse Button 4 Pressed.");
+          break;
+        case GLFW_MOUSE_BUTTON_5:
+          LOG_INFO("[Engine] Mouse Button 5 Pressed.");
+          break;
+        case GLFW_MOUSE_BUTTON_6:
+          LOG_INFO("[Engine] Mouse Button 6 Pressed.");
           break;
       }
     }
