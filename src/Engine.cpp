@@ -133,9 +133,9 @@ bool Engine::initializeWindowSystem() {
   m_windowManager->setMouseButtonCallback(
     [this](int button, int action, int mods) -> void { onMouseButton(button, action, mods); });
 
-  // m_windowManager->setMouseMoveCallback([this](double x, double y) -> void { onMouseMove(x, y); });
-
   m_windowManager->setScrollCallback([this](double xOffset, double yOffset) { onScroll(xOffset, yOffset); });
+
+  // m_windowManager->setMouseMoveCallback([this](double x, double y) -> void { onMouseMove(x, y); });
 
   LOG_INFO("[Engine] Window system intialized sucessfully");
   return true;
@@ -192,6 +192,13 @@ bool Engine::initializeInputSystem() {
           LOG_INFO("[Engine] Mouse Button 3 Pressed.");
           break;
       }
+    }
+  });
+
+  addEventListener([this](const EngineEvent& event) {
+    if (event.type == EngineEventType::MouseScroll && m_isRunning) {
+      float scrollAmount = static_cast<float>(event.data.scroll.yOffset);
+      LOG_INFO_F("[Engine] Scroll amount: {}", scrollAmount);
     }
   });
 
@@ -524,18 +531,18 @@ void Engine::onMouseMove(double x, double y) {
 
 void Engine::onScroll(double xOffset, double yOffset) {
   // Could be extended to log scrolls
-  // EngineEvent event;
-  // event.type = EngineEventType::Scroll;
-  // event.data.mousePos = {x, y};
-  // event.timestamp = m_totalTime;
+  EngineEvent event;
+  event.type = EngineEventType::MouseScroll;
+  event.data.scroll = {xOffset, yOffset};
+  event.timestamp = m_totalTime;
 
-  // dispatchEvent(event);
+  dispatchEvent(event);
 
   LOG_DEBUG_F("[Engine] Mouse scroll: ({}, {})", xOffset, yOffset);
 }
 
 void Engine::dispatchEvent(const EngineEvent& event) {
-  // Add event to our queue for processing
+  // Add event to queue for processing
   m_eventQueue.push_back(event);
 }
 

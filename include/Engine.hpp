@@ -40,6 +40,7 @@ enum class EngineEventType {
   MousePress,
   MouseRelease,
   MouseMove,
+  MouseScroll,
   EngineShutdown
 };
 
@@ -59,6 +60,9 @@ struct EngineEvent {
     struct {
       double x, y;
     } mousePos;
+    struct {
+      double xOffset, yOffset;
+    } scroll;
   } data;
 
   double timestamp;  // When the event occurred
