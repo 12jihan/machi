@@ -76,7 +76,6 @@ bool Engine::initialize() {
       LOG_ERROR("[Engine] Failed to initialize window system!");
       return false;
     }
-    // TODO: Create Render class
     // if (!initializeRenderingSystem()) {
     //   LOG_ERROR("[Engine] Failed to initialize rendering system!");
     //   return false;
@@ -141,7 +140,6 @@ bool Engine::initializeWindowSystem() {
   return true;
 };
 
-// TODO: extend the renderer class
 bool Engine::initializeRenderingSystem() {
   LOG_INFO("[Engine] Initializing rendering system...");
   // Set up basic OpenGL state based on our configuration
@@ -160,8 +158,8 @@ bool Engine::initializeRenderingSystem() {
 bool Engine::initializeInputSystem() {
   LOG_INFO("[Engine] Initializing input system...");
 
-  addEventListener([this](const EngineEvent& event) {
-    if (event.type == EngineEventType::KeyPress && m_isRunning) {
+  m_eventManager->subscribe([this](const Event& event) {
+    if (event.type == EventType::KeyPress && m_isRunning) {
       switch (event.data.keyboard.key) {
         case GLFW_KEY_ESCAPE:
           LOG_INFO("[Engine] Escape pressed - requesting shutdown");
@@ -178,8 +176,8 @@ bool Engine::initializeInputSystem() {
     }
   });
 
-  addEventListener([this](const EngineEvent& event) {
-    if (event.type == EngineEventType::MousePress && m_isRunning) {
+  m_eventManager->subscribe([this](const Event& event) {
+    if (event.type == EventType::MousePress && m_isRunning) {
       switch (event.data.mouse.button) {
         case GLFW_MOUSE_BUTTON_1:
           LOG_INFO("[Engine] Mouse Button 1 Pressed.");
@@ -203,15 +201,15 @@ bool Engine::initializeInputSystem() {
     }
   });
 
-  addEventListener([this](const EngineEvent& event) {
-    if (event.type == EngineEventType::MouseScroll && m_isRunning) {
+  m_eventManager->subscribe([this](const Event& event) {
+    if (event.type == EventType::MouseScroll && m_isRunning) {
       float scrollAmount = static_cast<float>(event.data.scroll.yOffset);
       LOG_INFO_F("[Engine] Scroll amount: {}", scrollAmount);
     }
   });
 
-  addEventListener([this](const EngineEvent& event) -> void {
-    if (event.type == EngineEventType::KeyPress && m_isRunning) {
+  m_eventManager->subscribe([this](const Event& event) -> void {
+    if (event.type == EventType::KeyPress && m_isRunning) {
       switch (event.data.keyboard.key) {
         case GLFW_KEY_W:
           LOG_INFO_F("Key Pressed: {}", "W");
@@ -238,8 +236,8 @@ bool Engine::initializeInputSystem() {
     }
   });
 
-  addEventListener([this](const EngineEvent& event) -> void {
-    if (event.type == EngineEventType::MouseMove && m_isRunning) {
+  m_eventManager->subscribe([this](const Event& event) -> void {
+    if (event.type == EventType::MouseMove && m_isRunning) {
       LOG_INFO_F("Mouse Position: ({}, {})", event.data.mousePos.x, event.data.mousePos.y);
     }
   });
@@ -247,11 +245,6 @@ bool Engine::initializeInputSystem() {
   LOG_INFO("[Engine] Input system intialized successfully");
   return true;
 }
-
-// bool Engine::intializeAudioSystem() {
-//   LOG_INFO("[Engine] Audio system intialization skipped (not implemented yet)");
-//   return true;
-// }
 
 void Engine::run() {
   if (!m_isInitialized) {
@@ -453,16 +446,10 @@ void Engine::processEvents() {
   m_windowManager->pollEvents();
 
   // Process our internal event queue
-  processEventQueue();
+  m_eventManager->dispatchEvents();
 }
 
 void Engine::updateSystems(float deltaTime) {
-  // TODO: implement Scene class
-  // Update the current scene if we have one
-  // if (m_currentScene) {
-  //   m_currentScene->update(deltaTime);
-  // }
-
   // Here you would update other engine system like:
   // - Physics system
   // - Audio system
@@ -588,49 +575,6 @@ void Engine::dispatchEvent(const EngineEvent& event) {
   m_eventQueue.push_back(event);
 }
 
-void Engine::processEventQueue() {
-  // Process all event in the queue
-  for (const auto& event : m_eventQueue) {
-    // Send event to all registered handlers
-    for (const auto& handler : m_eventHandlers) {
-      handler(event);
-    }
-  }
-
-  if (!m_eventQueue.empty()) {
-    m_eventQueue.clear();
-  };
-}
-
-// TODO: Implement Scene class
-// void Engine::performSceneTransition() {
-//   if (m_nextScene) {
-//     // Clean up currentScene
-//     if (m_currentScene) {
-//       m_currentScene.reset();
-//     }
-//
-//     // Switch to new scene
-//     mov_currentScene = std::move(m_nextScene);
-//     m_nextScene = nullptr;
-//
-//     LOG_INFO("[Engine] Scene transition completed");
-//   }
-// }
-
-// TODO: Implement Scene class
-// Public interface methods
-// Engine::setScene(std::unique_ptr<Scene> scene) {
-//   m_currentScene = std::move(scene);
-//   Log_INFO("[Engine] Scene set directly");
-// }
-
-// TODO: Implement Scene class
-// void Engine::transitionToScene(std::unique_ptr<Scene> scene) {
-//   m_nextScene = std::move(scene);
-//   LOG_INFO("[Engine] Scene transition queue");
-// }
-
 void Engine::addEventListener(const EventHandler& handler) {
   m_eventHandlers.push_back(handler);
 }
@@ -724,11 +668,11 @@ void Engine::shutdown() {
   m_isRunning = false;
 
   // Dispatch shutdown event
-  EngineEvent shutdownEvent;
-  shutdownEvent.type = EngineEventType::EngineShutdown;
+  Event shutdownEvent;
+  shutdownEvent.type = EventType::EngineShutdown;
   shutdownEvent.timestamp = m_totalTime;
-  dispatchEvent(shutdownEvent);
-  processEventQueue();
+  m_eventManager->postEvent(shutdownEvent);
+  // dispatchEvent(shutdownEvent);
 
   // shutdownSystems();
 

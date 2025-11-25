@@ -38,6 +38,7 @@ set(APP_SRC
   src/InputManager.cpp
   src/Utils.cpp
   src/Texture.cpp
+  src/EventManager.cpp
 )
 
 # Create your executable

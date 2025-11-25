@@ -2,12 +2,14 @@
 #include <chrono>
 #include <memory>
 #include <string>
+#include "EventManager.hpp"
 #include "WindowManager.hpp"
 
 // Forward declarations for systems we'll integrate later
 class Timer;
 class Input;
 class Renderer;
+class Event;
 
 // Engine configuration structure - this lets users customize the engine behavior
 struct EngineConfig {
@@ -69,7 +71,7 @@ struct EngineEvent {
 };
 
 // Event handler function type - systems can register these to respond to events
-using EventHandler = std::function<void(const EngineEvent&)>;
+// using EventHandler = std::function<void(const EngineEvent&)>;
 
 class Engine {
 private:
@@ -79,8 +81,8 @@ private:
   bool m_isRunning;
   bool m_isPaused;
 
-  // Window management - connection to WindowManager
   std::unique_ptr<WindowManager> m_windowManager;
+  std::unique_ptr<EventManager> m_eventManager;
 
   // Timing sustem for smooth frame rates and delta time calculation
   std::chrono::high_resolution_clock::time_point m_lastFrameTime;
@@ -125,7 +127,6 @@ private:
 
   // Event system methods
   void dispatchEvent(const EngineEvent& event);
-  void processEventQueue();
 
   // Scene management helpers
   void performSceneTransition();

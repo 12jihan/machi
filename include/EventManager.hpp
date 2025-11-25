@@ -1,7 +1,6 @@
 #pragma once
 #include <vector>
 #include <functional>
-#include <algorithm>
 #include <string>
 
 enum class EventType {
@@ -56,14 +55,19 @@ public:
   ~EventManager() = default;
 
   // Subscibe a function to listen for events
-  void subscribe();
+  void subscribe(const EventHandler& handler);
 
   // Add an event to the queue (to be processed next frame)
-  void postEvent();
+  void postEvent(const Event& event);
 
   // Dispatch all queued events to subscribers immediately
   void dispatchEvents();
 
   // Utility: Clear all events without processing (good for resets)
   void clearQueue();
+
+  // Getters
+  int getEventLength();
+
+  int getSubcriberLength();
 };
