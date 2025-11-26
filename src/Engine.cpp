@@ -32,7 +32,8 @@ Engine::Engine(const EngineConfig& config) :
  m_frameCount(0.0f),
  m_fps(0.0f),
  m_fpsUpdateTimer(0.0f),
- m_windowManager(nullptr)
+ m_windowManager(nullptr),
+ m_eventManager(nullptr)
 // m_currentScene(nullptr),
 // m_nextScene(nullptr)
 {
@@ -123,15 +124,11 @@ bool Engine::initializeWindowSystem() {
 
   // Setup all the window event callbacks to bridge into our event system
   m_windowManager->setResizeCallback([this](int width, int height) -> void { onWindowResize(width, height); });
-
   m_windowManager->setKeyCallback(
     [this](int key, int scancode, int actions, int mods) -> void { onKeyEvent(key, scancode, actions, mods); });
-
   m_windowManager->setMouseButtonCallback(
     [this](int button, int action, int mods) -> void { onMouseButton(button, action, mods); });
-
   m_windowManager->setScrollCallback([this](double xOffset, double yOffset) { onScroll(xOffset, yOffset); });
-
   m_windowManager->setMouseMoveCallback([this](double x, double y) -> void { onMouseMove(x, y); });
 
   LOG_INFO("[Engine] Window system intialized sucessfully");
@@ -154,6 +151,8 @@ bool Engine::initializeRenderingSystem() {
 }
 
 bool Engine::initializeInputSystem() {
+  m_eventManager = std::make_unique<EventManager>();
+
   LOG_INFO("[Engine] Initializing input system...");
 
   m_eventManager->subscribe([this](const Event& event) {
