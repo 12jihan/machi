@@ -84,8 +84,6 @@ bool Engine::initialize() {
       LOG_ERROR("[Engine] Failed to initialize input system!");
       return false;
     }
-    // Audio system is optional for now
-    // initializeAudioSystem();
 
     // Set up intial timing
     m_lastFrameTime = std::chrono::high_resolution_clock::now();

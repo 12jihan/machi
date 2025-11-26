@@ -147,12 +147,6 @@ public:
   void toggleFullscreen();
   bool isFullscreen() const;
 
-  // TODO: Create SceneManager
-  // Scene management - this is how you'll organize your game content
-  // void setScene(std::unique_ptr<Scene> scene);
-  // void transition(std::unique_ptr<Scene> scene);
-  // Scene* getCurrentScene() const { return m)_currentScene.get();};
-
   // Event system interface - allows other systems to respond to engine events
   void addEventListener(const EventHandler& handler);
   void removeEventListener(const EventHandler& handler);
