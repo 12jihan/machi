@@ -33,46 +33,6 @@ struct EngineConfig {
   int msaaSamples = 4;
 };
 
-// Event system - allows different parts of the engine to communicate
-enum class EngineEventType {
-  WindowResize,
-  WindowClose,
-  KeyPress,
-  KeyRelease,
-  MousePress,
-  MouseRelease,
-  MouseMove,
-  MouseScroll,
-  EngineShutdown
-};
-
-struct EngineEvent {
-  EngineEventType type;
-  // Union to hold different event data efficiently
-  union {
-    struct {
-      int width, height;
-    } resize;
-    struct {
-      int key, scancode, mods;
-    } keyboard;
-    struct {
-      int button, mods;
-    } mouse;
-    struct {
-      double x, y;
-    } mousePos;
-    struct {
-      double xOffset, yOffset;
-    } scroll;
-  } data;
-
-  double timestamp;  // When the event occurred
-};
-
-// Event handler function type - systems can register these to respond to events
-// using EventHandler = std::function<void(const EngineEvent&)>;
-
 class Engine {
 private:
   // Core engine state
@@ -94,10 +54,6 @@ private:
   int m_frameCount;
   float m_fps;
   float m_fpsUpdateTimer;
-
-  // Event system for communication between engine components
-  std::vector<EventHandler> m_eventHandlers;
-  std::vector<EngineEvent> m_eventQueue;
 
   // TODO: Create SceneManager
   // Scene management - this will hold your game's current state
@@ -124,9 +80,6 @@ private:
   void onScroll(double xOffset, double yOffset);
 
   void keyTest(GLFWwindow* window);
-
-  // Event system methods
-  void dispatchEvent(const EngineEvent& event);
 
   // Scene management helpers
   void performSceneTransition();
@@ -226,7 +179,7 @@ public:
 
   // Static utility methods
   static std::string getEngineVersion() {
-    return "0.0.08";
+    return "0.0.8.pre-alpha";
   }
   static std::string getBuildInfo();  // Implementation will include compile time, OpengGL version, etc.
 };

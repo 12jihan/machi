@@ -65,6 +65,7 @@ public:
 
   // Utility: Clear all events without processing (good for resets)
   void clearQueue();
+  void clearSubscribers();
 
   // Getters
   int getEventLength();

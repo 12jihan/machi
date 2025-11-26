@@ -506,35 +506,32 @@ void Engine::onWindowResize(int width, int height) {
   glViewport(0, 0, width, height);
 
   // Create and dispatch resize event
-  EngineEvent event;
-  event.type = EngineEventType::WindowResize;
+  Event event;
+  event.type = EventType::WindowResize;
   event.data.resize = {width, height};
   event.timestamp = m_totalTime;
-
-  dispatchEvent(event);
+  m_eventManager->postEvent(event);
 
   LOG_INFO_F("[Event] Window resized to {}x{}", width, height);
 }
 
 void Engine::onKeyEvent(int key, int scancode, int action, int mods) {
   LOG_DEBUG_F("Key Pressed: {}, {}", key, action);
-  EngineEvent event;
-  event.type =
-    (action == GLFW_PRESS || action == GLFW_REPEAT) ? EngineEventType::KeyPress : EngineEventType::KeyRelease;
+  Event event;
+  event.type = (action == GLFW_PRESS || action == GLFW_REPEAT) ? EventType::KeyPress : EventType::KeyRelease;
   event.data.keyboard = {key, scancode, mods};
   event.timestamp = m_totalTime;
-  dispatchEvent(event);
+  m_eventManager->postEvent(event);
 }
 
 void Engine::onMouseButton(int button, int action, int mods) {
   LOG_DEBUG_F("Mouse Button Pressed: {}", button);
 
-  EngineEvent event;
-  event.type =
-    (action == GLFW_PRESS || action == GLFW_REPEAT) ? EngineEventType::MousePress : EngineEventType::MouseRelease;
+  Event event;
+  event.type = (action == GLFW_PRESS || action == GLFW_REPEAT) ? EventType::MousePress : EventType::MouseRelease;
   event.data.mouse = {button, mods};
   event.timestamp = m_totalTime;
-  dispatchEvent(event);
+  m_eventManager->postEvent(event);
 }
 
 void Engine::keyTest(GLFWwindow* window) {
@@ -550,33 +547,23 @@ void Engine::keyTest(GLFWwindow* window) {
 };
 
 void Engine::onMouseMove(double x, double y) {
-  EngineEvent event;
-  event.type = EngineEventType::MouseMove;
+  Event event;
+  event.type = EventType::MouseMove;
   event.data.mousePos = {x, y};
   event.timestamp = m_totalTime;
   LOG_DEBUG_F("Mouse Movement: {}, {}", x, y);
-  dispatchEvent(event);
+  m_eventManager->postEvent(event);
 }
 
 void Engine::onScroll(double xOffset, double yOffset) {
   // Could be extended to log scrolls
-  EngineEvent event;
-  event.type = EngineEventType::MouseScroll;
+  Event event;
+  event.type = EventType::MouseScroll;
   event.data.scroll = {xOffset, yOffset};
   event.timestamp = m_totalTime;
-
-  dispatchEvent(event);
+  m_eventManager->postEvent(event);
 
   LOG_DEBUG_F("[Engine] Mouse scroll: ({}, {})", xOffset, yOffset);
-}
-
-void Engine::dispatchEvent(const EngineEvent& event) {
-  // Add event to queue for processing
-  m_eventQueue.push_back(event);
-}
-
-void Engine::addEventListener(const EventHandler& handler) {
-  m_eventHandlers.push_back(handler);
 }
 
 std::array<int, 2> Engine::getWindowSize() const {
@@ -584,8 +571,8 @@ std::array<int, 2> Engine::getWindowSize() const {
 }
 
 void Engine::setWindowSize(int width, int height) {
-  EngineEvent resizeEvent;
-  resizeEvent.type = EngineEventType::WindowResize;
+  Event event;
+  event.type = EventType::WindowResize;
 
   if (m_windowManager) {
     m_windowManager->setSize(width, height);
@@ -672,23 +659,17 @@ void Engine::shutdown() {
   shutdownEvent.type = EventType::EngineShutdown;
   shutdownEvent.timestamp = m_totalTime;
   m_eventManager->postEvent(shutdownEvent);
-  // dispatchEvent(shutdownEvent);
-
-  // shutdownSystems();
 
   m_isInitialized = false;
   LOG_INFO("[Engine] Engine shutdown completed");
 }
 
 void Engine::shutdownSystems() {
-  // TODO: Create Scene class
-  // Clean up scenes
-  // m_currentScene.reset();
-  // m_nextScene.reset();
-
   // Clear event handlers
-  m_eventHandlers.clear();
-  m_eventQueue.clear();
+  // m_eventHandlers.clear();
+  // m_eventQueue.clear();
+  m_eventManager->clearSubscribers();
+  m_eventManager->clearQueue();
 
   // WindowManager will clean up automatically through its destructor
   m_windowManager.reset();

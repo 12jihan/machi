@@ -25,6 +25,10 @@ void EventManager::clearQueue() {
   m_eventQueue.clear();
 }
 
+void EventManager::clearSubscribers() {
+  m_eventQueue.clear();
+}
+
 int EventManager::getEventLength() {
   return m_eventQueue.size();
 }
