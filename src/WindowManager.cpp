@@ -1,6 +1,7 @@
 #include "../include/WindowManager.hpp"
 #include <GLFW/glfw3.h>
 #include "../include/Logger.hpp"
+#include <cstdlib>
 #include <stdexcept>
 
 static bool s_glfwInitialized = false;
@@ -157,15 +158,20 @@ bool WindowManager::initializeGLAD() {
   return true;
 }
 
-// BUG: Some how this doesn't work
 void WindowManager::centerWindow() {
   if (!m_window)
     return;
+
   auto [monitorWidth, monitorHeight] = getPrimaryMonitorWorkArea();
   int x = (monitorWidth - m_config.width) / 2;
-  int y = (monitorWidth - m_config.width) / 2;
+  int y = (monitorHeight - m_config.width) / 2;
 
-  glfwSetWindowPos(m_window, x, y);
+  if (std::getenv("WAYLAND_DISPLAY") != nullptr) {
+    LOG_WARNING("[WindowManager] Running on Wayland. Window centering is disabled by the compositor.");
+    return;
+  } else {
+    glfwSetWindowPos(m_window, x, y);
+  }
 }
 
 // Static GLFW callbacks

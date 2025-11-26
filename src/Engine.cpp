@@ -666,8 +666,6 @@ void Engine::shutdown() {
 
 void Engine::shutdownSystems() {
   // Clear event handlers
-  // m_eventHandlers.clear();
-  // m_eventQueue.clear();
   m_eventManager->clearSubscribers();
   m_eventManager->clearQueue();
 
