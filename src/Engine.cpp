@@ -77,10 +77,17 @@ bool Engine::initialize() {
       LOG_ERROR("[Engine] Failed to initialize window system!");
       return false;
     }
+    // TODO: did something here but I can't remember why so I will ahve to look at it later
     // if (!initializeRenderingSystem()) {
     //   LOG_ERROR("[Engine] Failed to initialize rendering system!");
     //   return false;
     // }
+
+    if (!initializeEventSystem()) {
+      LOG_ERROR("[Engine] Failed to initialize input system!");
+      return false;
+    }
+
     if (!initializeInputSystem()) {
       LOG_ERROR("[Engine] Failed to initialize input system!");
       return false;
@@ -150,7 +157,7 @@ bool Engine::initializeRenderingSystem() {
   return true;
 }
 
-bool Engine::initializeInputSystem() {
+bool Engine::initializeEventSystem() {
   m_eventManager = std::make_unique<EventManager>();
 
   LOG_INFO("[Engine] Initializing input system...");
@@ -240,6 +247,10 @@ bool Engine::initializeInputSystem() {
   });
 
   LOG_INFO("[Engine] Input system intialized successfully");
+  return true;
+}
+
+bool Engine::initializeInputSystem() {
   return true;
 }
 

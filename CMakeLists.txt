@@ -39,6 +39,7 @@ set(APP_SRC
   src/Utils.cpp
   src/Texture.cpp
   src/EventManager.cpp
+  src/Camera.cpp
 )
 
 # Create your executable

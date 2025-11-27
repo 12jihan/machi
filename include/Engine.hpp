@@ -3,6 +3,7 @@
 #include <memory>
 #include <string>
 #include "EventManager.hpp"
+#include "InputManager.hpp"
 #include "WindowManager.hpp"
 
 // Forward declarations for systems we'll integrate later
@@ -43,6 +44,7 @@ private:
 
   std::unique_ptr<WindowManager> m_windowManager;
   std::unique_ptr<EventManager> m_eventManager;
+  std::unique_ptr<InputManager> m_InputManager;
 
   // Timing sustem for smooth frame rates and delta time calculation
   std::chrono::high_resolution_clock::time_point m_lastFrameTime;
@@ -55,15 +57,11 @@ private:
   float m_fps;
   float m_fpsUpdateTimer;
 
-  // TODO: Create SceneManager
-  // Scene management - this will hold your game's current state
-  // std::unique_ptr<Scene> m_currentScene;
-  // std::unique_ptr<Scene> m_nextScene;  // For scene transitions
-
   // Engine subsystem initialization methods
   bool initializeWindowSystem();
   bool initializeRenderingSystem();
   bool initializeInputSystem();
+  bool initializeEventSystem();
   bool initializeAudioSystem();  // For future expansion
 
   void processEvents();
