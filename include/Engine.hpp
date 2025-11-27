@@ -44,7 +44,8 @@ private:
 
   std::unique_ptr<WindowManager> m_windowManager;
   std::unique_ptr<EventManager> m_eventManager;
-  std::unique_ptr<InputManager> m_InputManager;
+  std::unique_ptr<InputManager> m_inputManager;
+  std::unique_ptr<InputManager> m_camera;
 
   // Timing sustem for smooth frame rates and delta time calculation
   std::chrono::high_resolution_clock::time_point m_lastFrameTime;
