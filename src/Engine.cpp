@@ -328,6 +328,7 @@ void Engine::run() {
     m_lastFrame = m_currentFrame;
 
     processEvents();
+    updateSystems(m_deltaTime);
     if (!m_isRunning)
       break;
     // keyTest(m_windowManager->getWindow());
@@ -341,13 +342,6 @@ void Engine::run() {
 
     // Activate Shader & Create transformations
     shader.use();
-    //
-    // glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-    // glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-    // glm::vec3 cameraUp = glm::vec3(0.0f, 0.0f, 0.0f);
-    // glm::vec3 cameraUp = glm::normalize(cameraPos - cameraTarget);
-    // glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
-    // glm::vec3 cameraUp = glm::normalize(glm::cross(cameraDirection, cameraRight));
 
     glm::mat4 view = glm::mat4(1.0f);
     float radius = 10.0f;
