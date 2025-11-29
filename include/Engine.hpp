@@ -65,6 +65,7 @@ private:
   bool initializeInputSystem();
   bool initializeEventSystem();
   bool initializeAudioSystem();  // For future expansion
+  bool initializeCamera();
 
   void processEvents();
   void updateSystems(float deltaTime);

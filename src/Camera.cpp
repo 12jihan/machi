@@ -1,3 +1,4 @@
+#include "../include/Logger.hpp"
 #include "../include/Camera.hpp"
 #include "../include/InputManager.hpp"
 #include <GLFW/glfw3.h>
@@ -28,6 +29,10 @@ void Camera::update(const InputManager& input, float deltaTime) {
     Position -= Right * velocity;
   if (input.isKeyPressed(GLFW_KEY_D))
     Position += Right * velocity;
+  if (input.isKeyPressed(GLFW_KEY_SPACE))
+    Position += WorldUp * velocity;
+  if (input.isKeyPressed(GLFW_KEY_LEFT_CONTROL))
+    Position -= WorldUp * velocity;
 
   // Mouse Rotation
   auto [mouseX, mouseY] = input.getMousePosition();

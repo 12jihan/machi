@@ -93,6 +93,11 @@ bool Engine::initialize() {
       return false;
     }
 
+    if (!initializeCamera()) {
+      LOG_ERROR("[Engine] Failed to initialize input system!");
+      return false;
+    }
+
     // Set up intial timing
     m_lastFrameTime = std::chrono::high_resolution_clock::now();
 
@@ -187,6 +192,11 @@ bool Engine::initializeEventSystem() {
 bool Engine::initializeInputSystem() {
   m_inputManager = std::make_unique<InputManager>();
   m_eventManager->subscribe([this](const Event& event) -> void { m_inputManager->onEvent(event); });
+  return true;
+}
+
+bool Engine::initializeCamera() {
+  m_camera = std::make_unique<Camera>(glm::vec3(0.0f, 0.0f, 3.0f));
   return true;
 }
 
@@ -322,13 +332,12 @@ void Engine::run() {
   direction.z = sin(glm::radians(yaw) * cos(glm::radians(pitch)));
 
   while (m_isRunning && !m_windowManager->shouldClose()) {
-    auto now = std::chrono::high_resolution_clock::now().time_since_epoch();
-    m_currentFrame = std::chrono::duration<float>(now).count();
-    m_deltaTime = m_currentFrame - m_lastFrame;
-    m_lastFrame = m_currentFrame;
+    auto now = std::chrono::high_resolution_clock::now();
+    m_deltaTime = std::chrono::duration<float>(now - m_lastFrameTime).count();
+    m_lastFrameTime = now;
 
     processEvents();
-    // updateSystems(m_deltaTime);
+    updateSystems(m_deltaTime);
     if (!m_isRunning)
       break;
 
@@ -342,12 +351,14 @@ void Engine::run() {
     // Activate Shader & Create transformations
     shader.use();
 
-    glm::mat4 view = glm::mat4(1.0f);
-    float radius = 10.0f;
-    float camX = static_cast<float>(sin(m_deltaTime) * radius);
-    float camZ = static_cast<float>(cos(m_deltaTime) * radius);
+    // glm::mat4 view = glm::mat4(1.0f);
+    // float radius = 10.0f;
+    // float camX = static_cast<float>(sin(m_deltaTime) * radius);
+    // float camZ = static_cast<float>(cos(m_deltaTime) * radius);
+    // view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+    // shader.setMat4("view", view);
 
-    view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+    glm::mat4 view = m_camera->GetViewMatrix();
     shader.setMat4("view", view);
 
     glBindVertexArray(vao);
