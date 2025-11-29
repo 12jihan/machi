@@ -180,77 +180,13 @@ bool Engine::initializeEventSystem() {
     }
   });
 
-  m_eventManager->subscribe([this](const Event& event) {
-    if (event.type == EventType::MousePress && m_isRunning) {
-      switch (event.data.mouse.button) {
-        case GLFW_MOUSE_BUTTON_1:
-          LOG_INFO("[Engine] Mouse Button 1 Pressed.");
-          break;
-        case GLFW_MOUSE_BUTTON_2:
-          LOG_INFO("[Engine] Mouse Button 2 Pressed.");
-          break;
-        case GLFW_MOUSE_BUTTON_3:
-          LOG_INFO("[Engine] Mouse Button 3 Pressed.");
-          break;
-        case GLFW_MOUSE_BUTTON_4:
-          LOG_INFO("[Engine] Mouse Button 4 Pressed.");
-          break;
-        case GLFW_MOUSE_BUTTON_5:
-          LOG_INFO("[Engine] Mouse Button 5 Pressed.");
-          break;
-        case GLFW_MOUSE_BUTTON_6:
-          LOG_INFO("[Engine] Mouse Button 6 Pressed.");
-          break;
-      }
-    }
-  });
-
-  m_eventManager->subscribe([this](const Event& event) {
-    if (event.type == EventType::MouseScroll && m_isRunning) {
-      float scrollAmount = static_cast<float>(event.data.scroll.yOffset);
-      LOG_INFO_F("[Engine] Scroll amount: {}", scrollAmount);
-    }
-  });
-
-  m_eventManager->subscribe([this](const Event& event) -> void {
-    if (event.type == EventType::KeyPress && m_isRunning) {
-      switch (event.data.keyboard.key) {
-        case GLFW_KEY_W:
-          LOG_INFO_F("Key Pressed: {}", "W");
-          break;
-        case GLFW_KEY_A:
-          LOG_INFO_F("Key Pressed: {}", "A");
-          break;
-        case GLFW_KEY_S:
-          LOG_INFO_F("Key Pressed: {}", "S");
-          break;
-        case GLFW_KEY_D:
-          LOG_INFO_F("Key Pressed: {}", "D");
-          break;
-        case GLFW_KEY_F:
-          LOG_INFO_F("Key Pressed: {}", "F");
-          break;
-        case GLFW_KEY_E:
-          LOG_INFO_F("Key Pressed: {}", "E");
-          break;
-        case GLFW_KEY_Q:
-          LOG_INFO_F("Key Pressed: {}", "Q");
-          break;
-      }
-    }
-  });
-
-  m_eventManager->subscribe([this](const Event& event) -> void {
-    if (event.type == EventType::MouseMove && m_isRunning) {
-      LOG_INFO_F("Mouse Position: ({}, {})", event.data.mousePos.x, event.data.mousePos.y);
-    }
-  });
-
   LOG_INFO("[Engine] Input system intialized successfully");
   return true;
 }
 
 bool Engine::initializeInputSystem() {
+  m_inputManager = std::make_unique<InputManager>();
+  m_eventManager->subscribe([this](const Event& event) -> void { m_inputManager->onEvent(event); });
   return true;
 }
 
