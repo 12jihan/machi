@@ -328,10 +328,9 @@ void Engine::run() {
     m_lastFrame = m_currentFrame;
 
     processEvents();
-    updateSystems(m_deltaTime);
+    // updateSystems(m_deltaTime);
     if (!m_isRunning)
       break;
-    // keyTest(m_windowManager->getWindow());
 
     glClearColor(0.1, 0.0, 0.5, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -347,7 +346,7 @@ void Engine::run() {
     float radius = 10.0f;
     float camX = static_cast<float>(sin(m_deltaTime) * radius);
     float camZ = static_cast<float>(cos(m_deltaTime) * radius);
-    // view = glm::lookAt(glm::vec3(camX, 0.0f, camZ), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
     view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
     shader.setMat4("view", view);
 
@@ -472,18 +471,6 @@ void Engine::onMouseButton(int button, int action, int mods) {
   event.timestamp = m_totalTime;
   m_eventManager->postEvent(event);
 }
-
-void Engine::keyTest(GLFWwindow* window) {
-  const float cameraSpeed = 0.05f;
-  if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-    cameraPos += cameraSpeed * cameraFront;
-  if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-    cameraPos -= cameraSpeed * cameraFront;
-  if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-    cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
-  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-    cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
-};
 
 void Engine::onMouseMove(double x, double y) {
   Event event;
