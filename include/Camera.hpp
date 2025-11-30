@@ -23,8 +23,8 @@ public:
   glm::quat Orientation;
 
   // Euler Angles
-  // float Yaw;
-  // float Pitch;
+  float Yaw;
+  float Pitch;
 
   // Camera options
   float MovementSpeed;

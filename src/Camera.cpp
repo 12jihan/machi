@@ -3,18 +3,23 @@
 #include "../include/InputManager.hpp"
 #include <GLFW/glfw3.h>
 #include <glm/fwd.hpp>
+#include <glm/trigonometric.hpp>
 
 Camera::Camera(glm::vec3 position, glm::vec3 up) :
- Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(2.5f), MouseSensitivity(0.1f) {
-  Position = position;
-  WorldUp = up;
+ Position(position),
+ Front(glm::vec3(0.0f, 0.0f, -1.0f)),
+ Up(glm::vec3(0.0f, 1.0f, 0.0f)),
+ Right(glm::vec3(1.0f, 0.0f, 0.0f)),
+ WorldUp(up),
+ Orientation(glm::quat(1.0f, 0.0f, 0.0f, 0.0f)),
+ Yaw(0.0f),
+ Pitch(0.0f),
+ MovementSpeed(2.5f),
+ MouseSensitivity(0.1f) {
   updateCameraVectors();
 }
 
 glm::mat4 Camera::GetViewMatrix() {
-  // glm::mat4 rotation = glm::mat4_cast(Orientation);
-  // glm::mat4 translation = glm::translate(glm::mat4(1.0f), -Position);
-
   return glm::lookAt(Position, Position + Front, Up);
 }
 
@@ -44,18 +49,22 @@ void Camera::update(const InputManager& input, float deltaTime) {
 
   // Mouse to radians
   if (deltaX != 0.0 || deltaY != 0.0) {
-    float yawAngle = glm::radians(static_cast<float>(-deltaX) * MouseSensitivity);
-    float pitchAngle = glm::radians(static_cast<float>(-deltaY) * MouseSensitivity);
+    // Accumulate Angles
+    Yaw += static_cast<float>(-deltaX) * MouseSensitivity;
+    Pitch += static_cast<float>(deltaY) * MouseSensitivity;
 
-    // Quaternion for each rotations
-    // Yaw
-    glm::quat yawRotation = glm::angleAxis(yawAngle, WorldUp);
+    // Clamp putch to prevent flipping upside down
+    if (Pitch > 89.0f)
+      Pitch = 89.0f;
+    if (Pitch < -89.0f)
+      Pitch = -89.0f;
 
-    // Pitch
-    glm::quat pitchRotation = glm::angleAxis(pitchAngle, Right);
+    // Quaternion for each rotations Yaw & Pitch
+    glm::quat yawRotation = glm::angleAxis(glm::radians(Yaw), WorldUp);
+    glm::quat pitchRotation = glm::angleAxis(glm::radians(Pitch), Right);
 
     // Apply the rotations
-    Orientation = yawRotation * Orientation * pitchRotation;
+    Orientation = yawRotation * pitchRotation;
 
     // normalize for drifting
     Orientation = glm::normalize(Orientation);
@@ -66,7 +75,7 @@ void Camera::update(const InputManager& input, float deltaTime) {
 }
 
 void Camera::updateCameraVectors() {
-  Front = glm::normalize(Orientation * glm::vec3(0.0f, 0.0f, -8.0f));
+  Front = glm::normalize(Orientation * glm::vec3(0.0f, 0.0f, -1.0f));
   Right = glm::normalize(Orientation * glm::vec3(1.0f, 0.0f, 0.0f));
   Up = glm::normalize(Orientation * glm::vec3(0.0f, 1.0f, 0.0f));
 }
