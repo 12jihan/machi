@@ -347,26 +347,16 @@ void Engine::run() {
     // bind Texture
     texture0.bindTexture();
     texture1.bindTexture();
-
     // Activate Shader & Create transformations
     shader.use();
-
-    // glm::mat4 view = glm::mat4(1.0f);
-    // float radius = 10.0f;
-    // float camX = static_cast<float>(sin(m_deltaTime) * radius);
-    // float camZ = static_cast<float>(cos(m_deltaTime) * radius);
-    // view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
-    // shader.setMat4("view", view);
-
     glm::mat4 view = m_camera->GetViewMatrix();
     shader.setMat4("view", view);
-
     glBindVertexArray(vao);
+
     for (unsigned int i = 0; i < 10; i++) {
       glm::mat4 model = glm::mat4(1.0f);
       model = glm::translate(model, cubePositions[i]);
       float angle = 20.0f * i;
-      // model = glm::rotate(model, dt_seconds * glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
       model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
       shader.setMat4("model", model);
 
