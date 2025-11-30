@@ -54,12 +54,8 @@ void Camera::update(const InputManager& input, float deltaTime) {
     Yaw += static_cast<float>(-deltaX) * MouseSensitivity;
     Pitch += static_cast<float>(deltaY) * MouseSensitivity;
 
-    // Clamp putch to prevent flipping upside down
-    Pitch = glm::clamp(Pitch, -75.0f, 75.0f);
-    // if (Pitch > 89.0f)
-    //   Pitch = 89.0f;
-    // if (Pitch < -89.0f)
-    //   Pitch = -89.0f;
+    // Clamp pitch to prevent flipping upside down
+    Pitch = glm::clamp(Pitch, -89.0f, 89.0f);
 
     // Quaternion for each rotations Yaw & Pitch
     glm::quat yawRotation = glm::angleAxis(glm::radians(Yaw), WorldUp);
