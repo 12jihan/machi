@@ -1,7 +1,16 @@
 #include "../include/InputManager.hpp"
 #include "../include/Logger.hpp"
 
-InputManager::InputManager() : m_mouseX(0.0), m_mouseY(0.0), m_scrollX(0.0), m_scrollY(0.0) {
+InputManager::InputManager() :
+ m_mouseX(0.0),
+ m_mouseY(0.0),
+ m_lastMouseX(0.0),
+ m_lastMouseY(0.0),
+ m_mouseDeltaX(0.0),
+ m_mouseDeltaY(0.0),
+ m_scrollX(0.0),
+ m_scrollY(0.0),
+ m_firstMouse(true) {
   // Initialize all keys to false (not pressed)
   m_keyStates.fill(false);
   m_mouseButtonStates.fill(false);
@@ -42,7 +51,19 @@ void InputManager::onEvent(const Event& event) {
     case EventType::MouseMove:
       m_mouseX = event.data.mousePos.x;
       m_mouseY = event.data.mousePos.y;
-      LOG_INFO_F("Mouse Position: ({}, {})", event.data.mousePos.x, event.data.mousePos.y);
+      if (m_firstMouse) {
+        m_lastMouseX = m_mouseX;
+        m_lastMouseY = m_mouseY;
+        m_firstMouse = false;
+      }
+
+      // Calculating how much the mouse moved since the last frame
+      m_mouseDeltaX = m_mouseX - m_lastMouseX;
+      m_mouseDeltaY = m_lastMouseY - m_mouseY;  // Reversed! Y is inverted in screen coordinates
+
+      // Remember this position for next time
+      m_lastMouseX = m_mouseX;
+      m_lastMouseY = m_mouseY;
       break;
 
     case EventType::MouseScroll:
@@ -75,3 +96,12 @@ bool InputManager::isMouseButtonPressed(int button) const {
 std::pair<double, double> InputManager::getMousePosition() const {
   return {m_mouseX, m_mouseY};
 }
+
+std::pair<double, double> InputManager::getMouseDelta() const {
+  return {m_mouseDeltaX, m_mouseDeltaY};
+}
+
+void InputManager::resetMouseDelta() {
+  m_mouseDeltaX = 0.0;
+  m_mouseDeltaY = 0.0;
+};

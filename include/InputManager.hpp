@@ -10,6 +10,9 @@ private:
   std::array<bool, 1024> m_keyStates;
   std::array<bool, 16> m_mouseButtonStates;
   double m_mouseX, m_mouseY;
+  double m_lastMouseX, m_lastMouseY;
+  double m_mouseDeltaX, m_mouseDeltaY;
+  bool m_firstMouse;
   double m_scrollX, m_scrollY;
 
 public:
@@ -23,7 +26,9 @@ public:
   bool isKeyPressed(int keycode) const;
   bool isMouseButtonPressed(int button) const;
   std::pair<double, double> getMousePosition() const;
+  std::pair<double, double> getMouseDelta() const;
 
   // Optional: for now -- clear scroll every frame since it's an "impulse" not a state
   void clearScroll();
+  void resetMouseDelta();
 };

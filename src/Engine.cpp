@@ -405,6 +405,7 @@ void Engine::updateSystems(float deltaTime) {
   // - Particle systems
   // - UI system
   m_camera->update(*m_inputManager, deltaTime);
+  m_inputManager->resetMouseDelta();
 };
 
 void Engine::renderFrame() {

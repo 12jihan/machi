@@ -2,6 +2,7 @@
 
 #include <glm/fwd.hpp>
 #include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 class InputManager;
@@ -18,18 +19,18 @@ public:
   glm::vec3 Right;
   glm::vec3 WorldUp;
 
+  // Quaternion
+  glm::quat Orientation;
+
   // Euler Angles
-  float Yaw;
-  float Pitch;
+  // float Yaw;
+  // float Pitch;
 
   // Camera options
   float MovementSpeed;
   float MouseSensitivity;
 
-  Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f),
-         glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f),
-         float yaw = -90.0f,
-         float pitch = 0.0f);
+  Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f));
 
   // Returns the view matrix calculated using Euler Angles and the LookAt Matrix
   glm::mat4 GetViewMatrix();

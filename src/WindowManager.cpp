@@ -54,6 +54,9 @@ bool WindowManager::initialize() {
     // Store this instance in GLFW user pointer for callbnacks
     glfwSetWindowUserPointer(m_window, this);
 
+    // Set the cursor input mode
+    glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
     // Set up callbacks
     setupCallbacks();
 
