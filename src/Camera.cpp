@@ -2,6 +2,7 @@
 #include "../include/Camera.hpp"
 #include "../include/InputManager.hpp"
 #include <GLFW/glfw3.h>
+#include <glm/common.hpp>
 #include <glm/fwd.hpp>
 #include <glm/trigonometric.hpp>
 
@@ -54,24 +55,19 @@ void Camera::update(const InputManager& input, float deltaTime) {
     Pitch += static_cast<float>(deltaY) * MouseSensitivity;
 
     // Clamp putch to prevent flipping upside down
-    if (Pitch > 89.0f)
-      Pitch = 89.0f;
-    if (Pitch < -89.0f)
-      Pitch = -89.0f;
+    Pitch = glm::clamp(Pitch, -75.0f, 75.0f);
+    // if (Pitch > 89.0f)
+    //   Pitch = 89.0f;
+    // if (Pitch < -89.0f)
+    //   Pitch = -89.0f;
 
     // Quaternion for each rotations Yaw & Pitch
     glm::quat yawRotation = glm::angleAxis(glm::radians(Yaw), WorldUp);
-    glm::quat pitchRotation = glm::angleAxis(glm::radians(Pitch), Right);
-
-    // Apply the rotations
-    Orientation = yawRotation * pitchRotation;
-
-    // normalize for drifting
-    Orientation = glm::normalize(Orientation);
-
-    // Recalculate the camera vectors based on new angles
-    updateCameraVectors();
+    glm::vec3 localRight = yawRotation * glm::vec3(1.0f, 0.0f, 0.0f);
+    glm::quat pitchRotation = glm::angleAxis(glm::radians(Pitch), localRight);
+    Orientation = pitchRotation * yawRotation;
   }
+  updateCameraVectors();
 }
 
 void Camera::updateCameraVectors() {
