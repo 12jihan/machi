@@ -395,10 +395,6 @@ void Engine::run() {
 
     // Update frame statistics for performance monitoring
     calculateFrameStats();
-    // }
-    // TODO: Create Scene class
-    // Handle scene transitions if needed
-    // performSceneTransition();
   }
 
   glDeleteVertexArrays(1, &vao);
