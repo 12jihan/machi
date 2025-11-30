@@ -364,7 +364,7 @@ void Engine::run() {
     if (!m_isRunning)
       break;
 
-    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glClearColor(0.05, 0.05, 0.05, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // bind Texture
@@ -378,6 +378,7 @@ void Engine::run() {
     // Lighting
     shader.setVec3("lightPos", lightPos);
     shader.setVec3("lightColor", lightColor);
+    shader.setVec3("viewPos", m_camera->Position);
 
     glBindVertexArray(vao);
 

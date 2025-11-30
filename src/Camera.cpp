@@ -46,7 +46,6 @@ void Camera::update(const InputManager& input, float deltaTime) {
 
   // Mouse Rotation
   auto [deltaX, deltaY] = input.getMouseDelta();
-  LOG_INFO_F("Mouse moving: {}, {}", deltaX, deltaY);
 
   // Mouse to radians
   if (deltaX != 0.0 || deltaY != 0.0) {

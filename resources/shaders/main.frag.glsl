@@ -14,32 +14,33 @@ uniform sampler2D texture1;
 // Lighting uniforms
 uniform vec3 lightPos;
 uniform vec3 lightColor;
-uniform vec3 objectColor;
+uniform vec3 viewPos;
 
 void main()
 {
   // 1. Ambient Lighting
-  // The "Everything" lighting
   float ambientStrength = 0.1;
   vec3 ambient = ambientStrength * lightColor;
-  
+
   // 2. Diffuse Lighting
-  // Normalizing the normal
   vec3 norm = normalize(Normal);
-  // Calculating direction from frag to the light
   vec3 lightDir = normalize(lightPos - FragPos);
-  // Dot product
   float diff = max(dot(norm, lightDir), 0.0);
   vec3 diffuse = diff * lightColor;
+  
+  // 3. Specular Lighting
+  float specularStrength = 0.5;
+  int shininess = 32;
+
+  // Direction from frag to camera
+  vec3 viewDir = normalize(viewPos - FragPos);
+  vec3 reflectDir = reflect(-lightDir, norm);
+  float spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
+  vec3 specular = specularStrength * spec * lightColor;
 
   // Combine Everything
-  // Adding ambient and diffuse together
-  vec3 lighting = ambient + diffuse;
-
-  // Texture color
+  vec3 lighting = ambient + diffuse + specular;
   vec4 texColor = mix(texture(texture0, TexCoord), texture(texture1, TexCoord), 0.5);
-
-  // Final color = lighting * texture
   vec3 result = lighting * texColor.rgb;
 
   FragColor = vec4(result, 1.0);
