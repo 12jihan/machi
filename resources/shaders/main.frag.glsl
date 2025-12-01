@@ -16,6 +16,11 @@ uniform vec3 lightPos;
 uniform vec3 lightColor;
 uniform vec3 viewPos;
 
+// Attenuation uniforms
+uniform float constant;
+uniform float linear;
+uniform float quadratic;
+
 void main()
 {
   // 1. Ambient Lighting
@@ -37,6 +42,19 @@ void main()
   vec3 reflectDir = reflect(-lightDir, norm);
   float spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
   vec3 specular = specularStrength * spec * lightColor;
+
+  // 4. Attenuation
+  // Calculate distance from light to this fragment
+  float distance = length(lightPos - FragPos);
+
+  // Apply attenuation formula
+  float attenuation = 1.0 / (constant + linear + distance + quadratic * distance * distance);
+
+  // Scale all lighting components by attenuation
+  ambient *= attenuation; 
+  diffuse *= attenuation;
+  specular *= attenuation;
+
 
   // Combine Everything
   vec3 lighting = ambient + diffuse + specular;

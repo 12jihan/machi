@@ -340,20 +340,16 @@ void Engine::run() {
   m_isRunning = true;
   m_lastFrameTime = std::chrono::high_resolution_clock::now();
 
-  // Main engine, loop - this is the heart of your game engine
-  LOG_INFO_F("[Engine]::[Shader] m_isPaused {}", m_isPaused);
-
-  LOG_INFO_F("checking the window config frame: {} x {}", m_config.windowWidth, m_config.windowHeight);
-  auto start_time = std::chrono::high_resolution_clock::now();
-
   glm::mat4 projection =
     glm::perspective(glm::radians(45.0f), (float)m_config.windowWidth / (float)m_config.windowHeight, 0.1f, 100.0f);
   shader.setMat4("projection", projection);
 
   // Light Properties
-  glm::vec3 lightPos(1.2f, 1.0f, 2.0f);    // Light position in the world
-  glm::vec3 lightColor(1.0f, 1.0f, 1.0f);  // Light Color
+  // glm::vec3 lightDirection(-0.2f, -1.0f, -0.3f);
+  glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+  glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
 
+  // Main engine, loop
   while (m_isRunning && !m_windowManager->shouldClose()) {
     auto now = std::chrono::high_resolution_clock::now();
     m_deltaTime = std::chrono::duration<float>(now - m_lastFrameTime).count();
@@ -375,10 +371,15 @@ void Engine::run() {
     shader.use();
     glm::mat4 view = m_camera->GetViewMatrix();
     shader.setMat4("view", view);
+
     // Lighting
     shader.setVec3("lightPos", lightPos);
     shader.setVec3("lightColor", lightColor);
     shader.setVec3("viewPos", m_camera->Position);
+
+    shader.setFloat("constant", 1.0f);
+    shader.setFloat("linear", 0.09f);
+    shader.setFloat("quadratic", 0.032f);
 
     glBindVertexArray(vao);
 
@@ -427,12 +428,6 @@ void Engine::renderFrame() {
   LOG_INFO("[Engine] running renderer");
   // Clear the screen with our configured background color
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-  // TODO: Implement Scene class
-  // Render the current scene if we have one
-  // if (m_currentScene) {
-  //   m_currentScene->render();
-  // }
 
   // Preset the rendered frame to the screen
   m_windowManager->swapBuffers();
@@ -541,7 +536,6 @@ void Engine::setWindowTitle(const std::string& title) {
   }
 }
 
-// TODO: Fix fullscreen
 void Engine::toggleFullscreen() {
   if (m_windowManager) {
     m_windowManager->toggleFullscreen();
