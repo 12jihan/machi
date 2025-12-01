@@ -2,7 +2,6 @@
 
 out vec4 FragColor;
 
-// Inputs from vertex shader
 in vec3 FragPos; 
 in vec3 Normal;
 in vec2 TexCoord;
@@ -11,7 +10,7 @@ in vec2 TexCoord;
 uniform sampler2D texture0;
 uniform sampler2D texture1;
 
-// Lighting uniforms
+// Lighting Properties
 uniform vec3 lightPos;
 uniform vec3 lightColor;
 uniform vec3 viewPos;
