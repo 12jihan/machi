@@ -378,8 +378,8 @@ void Engine::run() {
     shader.setVec3("viewPos", m_camera->Position);
 
     shader.setFloat("constant", 1.0f);
-    shader.setFloat("linear", 0.09f);
-    shader.setFloat("quadratic", 0.032f);
+    shader.setFloat("linear", 0.045f);
+    shader.setFloat("quadratic", 0.0075f);
 
     glBindVertexArray(vao);
 
